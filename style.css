@@ -6,8 +6,8 @@
   --grey:    #555555;
   --light:   #f5f5f3;
   --border:  #e2e2de;
-  --accent:  #6366f1;
-  --accent-light: #ede9fe;
+  --accent:  #059b6b;
+  --accent-light: #d4f3e9;
   --white:   #ffffff;
   --max:     720px;
   --mono:    'Courier New', Courier, monospace;
@@ -85,28 +85,30 @@ nav {
 
 .hero-label {
   font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.12em;
+  font-size: 13px;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--accent);
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  font-weight: 700;
 }
 
 .hero h1 {
-  font-size: 2.4rem;
-  font-weight: normal;
-  line-height: 1.25;
-  letter-spacing: -0.5px;
-  margin-bottom: 20px;
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: 24px;
   color: var(--black);
 }
 
 .hero-tagline {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   color: var(--grey);
   max-width: 560px;
   margin-bottom: 32px;
   line-height: 1.65;
+  font-weight: 500;
 }
 
 .hero-actions {
@@ -117,11 +119,11 @@ nav {
 
 .btn {
   display: inline-block;
-  padding: 10px 22px;
+  padding: 12px 28px;
   border-radius: 6px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   text-decoration: none;
   transition: background 0.15s, color 0.15s;
 }
@@ -142,11 +144,12 @@ nav {
 /* ── Section headings ───────────────────────────────────────────────────── */
 .section-label {
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
+  font-size: 12px;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--grey);
+  color: var(--accent);
   margin-bottom: 28px;
+  font-weight: 700;
 }
 
 /* ── About ──────────────────────────────────────────────────────────────── */
@@ -194,8 +197,8 @@ nav {
 
 .project-title {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 900;
   color: var(--black);
 }
 
@@ -274,11 +277,11 @@ footer {
 .back-link:hover { color: var(--black); }
 
 .project-hero h1 {
-  font-size: 2rem;
-  font-weight: normal;
-  letter-spacing: -0.4px;
-  margin-bottom: 16px;
-  line-height: 1.25;
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  margin-bottom: 20px;
+  line-height: 1.15;
 }
 
 .project-hero-meta {
@@ -332,10 +335,11 @@ footer {
 }
 
 .card h2 {
-  font-size: 1.15rem;
-  font-weight: normal;
+  font-size: 1.3rem;
+  font-weight: 800;
   margin-bottom: 16px;
   letter-spacing: -0.2px;
+  color: var(--black);
 }
 
 .card p {
