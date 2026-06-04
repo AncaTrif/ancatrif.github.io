@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A³ — AI Use Decision Tool · Anca Trif</title>
+  <meta name="description" content="A tool that helps individuals and teams classify AI use cases as Automate, Assist, or Avoid — building a practical AI governance ledger." />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-name" href="/">Anca Trif</a>
+      <ul class="nav-links">
+        <li><a href="/#about">About</a></li>
+        <li><a href="/#projects">Projects</a></li>
+        <li><a href="https://www.linkedin.com/in/ancatrif" target="_blank" rel="noopener">LinkedIn</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- Project hero -->
+    <div class="project-hero">
+      <a class="back-link" href="/">← Back to portfolio</a>
+      <h1>A³ — AI Use Decision Tool</h1>
+      <div class="project-hero-meta">
+        <span class="meta-tag">AI · Product · React · Node.js</span>
+        <span class="meta-date">2026</span>
+      </div>
+      <p class="project-hero-desc">
+        A tool that helps individuals and teams decide, for any given task, whether to Automate, Assist, or Avoid AI involvement — and turns those decisions into a living governance ledger. Based on the A³ framework by <a href="https://age-of-product.com" target="_blank" rel="noopener">Stefan Wolpers</a>.
+      </p>
+      <a class="btn btn-dark" href="https://a3.ancatrif.com" target="_blank" rel="noopener">Open the tool →</a>
+    </div>
+
+    <!-- Content cards -->
+    <div class="cards">
+
+      <div class="card card-accent">
+        <p class="card-label">The problem it solves</p>
+        <p>Most teams know they should think carefully about where AI belongs in their work, but in practice every decision happens ad hoc, inconsistently, and gets lost. A³ helps individuals and teams decide, for any given task, whether to use AI assistance, avoid it, or automate it fully.</p>
+        <p>The output is not just a recommendation: it builds into a living decision ledger that becomes the team's practical AI governance, without anyone having to dig through policy documents or ask around.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-label">Design choices and tradeoffs</p>
+        <p>I prioritized a functional MVP over polish: no custom design, straightforward React, no database at this stage. Two deliberate omissions worth naming.</p>
+        <p>I did not add a database (PostgreSQL would be the natural next step) because I wanted to validate the core logic before adding infrastructure complexity. And I removed document upload, even though it would make recommendations more contextual, because I am aware of the data handling requirements that would need to be in place first: a DPA with the hosting provider, zero data retention on the API side, and proper access controls. A demo tool is not the right place to handle governance documents.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-label">Architecture in plain language</p>
+        <p>The tool runs two flows.</p>
+        <p><strong>Classification:</strong></p>
+        <div class="flow">
+          <div class="flow-step"><span class="flow-num">1</span>The user types a task</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><span class="flow-num">2</span>The browser sends it to the Claude API</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><span class="flow-num">3</span>Claude returns a classification (Assist / Automate / Avoid) with reasoning</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><span class="flow-num">4</span>The user reviews, edits if needed, and confirms</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><span class="flow-num">5</span>The browser sends the confirmed version to the server, which saves it to a local file</div>
+        </div>
+        <p style="margin-top: 16px;"><strong>Export:</strong> Confirmed decisions accumulate in a ledger visible in the tool. When the user hits Download CSV, the browser converts the ledger data it already holds into a CSV file locally, and the file downloads directly without another server round-trip. That client-side generation is a deliberate choice: it keeps the export fast and reduces unnecessary server load.</p>
+      </div>
+
+      <div class="card card-highlight">
+        <p class="card-label">What it is not ready for yet</p>
+        <p>To handle real organisational data, this tool would need: authentication (SSO or email-based login), a Data Processing Agreement with the hosting provider, Anthropic Enterprise API terms with zero data retention enabled, encrypted storage, and audit logging that tracks usage without retaining document content.</p>
+        <p>GDPR compliance would also require confirming EU data residency. None of this is complex in principle, but all of it needs to be in place before an org uploads anything sensitive.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-label">How it would scale</p>
+        <p>The sequence matters: security and authentication first, then database, then document upload with proper data handling in place, then expanding toward a conversational interface where teams can query their own AI governance history.</p>
+        <p>The goal is a lightweight internal tool that gives organisations a practical, evolving answer to the question of how to use AI — without needing a consultant every time.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-label">Reflection</p>
+        <p>Building this iteratively with Claude Code taught me something useful about AI-assisted development: the limiting factor is not the tool, it is the clarity of your own thinking. The moments where the output surprised me were usually moments where I had not been precise enough about what I actually wanted.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-label">Credits</p>
+        <p>The A³ framework (Assist / Automate / Avoid) was developed by <span class="credit-name">Stefan Wolpers</span> and is documented at <a href="https://age-of-product.com" target="_blank" rel="noopener">Age of Product</a>. This tool is a practical implementation of that framework, built to make the classification process interactive and to turn individual decisions into a cumulative team resource.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span>Anca Trif</span>
+      <a href="https://www.linkedin.com/in/ancatrif" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </footer>
+
+</body>
+</html>
