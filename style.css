@@ -446,65 +446,43 @@ footer {
   color: var(--grey);
   white-space: nowrap;
   padding-right: 24px;
+  padding-top: 10px;
   width: 1%;
+  vertical-align: top;
 }
 
-/* ── Model card accordion ───────────────────────────────────────────────── */
-.model-card-table {
-  border-collapse: collapse;
-  width: 100%;
-}
+/* ── Collapsible cards ──────────────────────────────────────────────────── */
+.collapsible-card { padding: 0; overflow: hidden; }
 
-.mc-row td {
-  padding: 0;
-  border-bottom: none;
-}
-
-.mc-toggle {
+.card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  padding: 11px 14px;
-  border-radius: 6px;
-  transition: background 0.15s;
+  padding: 22px 32px;
   user-select: none;
-  border: 1px solid var(--border);
-  margin-bottom: 6px;
-  background: var(--white);
+  transition: background 0.15s;
 }
-.mc-toggle:hover { background: var(--light); }
+.collapsible-card:hover .card-header { background: rgba(0,0,0,0.02); }
+.card-accent .card-header:hover { background: rgba(0,0,0,0.03); }
+.card-highlight .card-header:hover { background: rgba(0,0,0,0.03); }
 
-.mc-toggle-label {
-  font-family: var(--mono);
+.card-header .card-label { margin-bottom: 0; }
+
+.card-arrow {
   font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--grey);
-}
-
-.mc-arrow {
-  font-size: 11px;
   color: var(--grey);
   transition: transform 0.2s;
   flex-shrink: 0;
+  margin-left: 16px;
 }
-.mc-arrow.open { transform: rotate(90deg); }
+.card-arrow.open { transform: rotate(180deg); }
 
-.mc-body {
+.card-body {
   display: none;
-  font-size: 0.88rem;
-  color: #333;
-  line-height: 1.7;
-  padding: 10px 14px 14px;
-  margin-bottom: 6px;
-  background: var(--light);
-  border-radius: 0 0 6px 6px;
-  margin-top: -6px;
-  border: 1px solid var(--border);
-  border-top: none;
+  padding: 0 32px 28px;
 }
-.mc-body.open { display: block; }
+.card-body.open { display: block; }
 
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {

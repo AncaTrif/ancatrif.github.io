@@ -39,109 +39,129 @@
     <!-- Content cards -->
     <div class="cards">
 
-      <div class="card card-accent">
-        <p class="card-label">The problem it solves</p>
-        <p>Most teams know they should think carefully about where AI belongs in their work, but in practice every decision happens ad hoc, inconsistently, and gets lost. A³ helps individuals and teams decide, for any given task, whether to use AI assistance, avoid it, or automate it fully.</p>
-        <p>The output is not just a recommendation: it builds into a living decision ledger that becomes the team's practical AI governance, without anyone having to dig through policy documents or ask around.</p>
-      </div>
-
-      <div class="card">
-        <p class="card-label">Design choices and tradeoffs</p>
-        <p>I prioritized a functional MVP over polish: no custom design, straightforward React, no database at this stage. Two deliberate omissions worth naming.</p>
-        <p>I did not add a database (PostgreSQL would be the natural next step) because I wanted to validate the core logic before adding infrastructure complexity. And I removed document upload, even though it would make recommendations more contextual, because I am aware of the data handling requirements that would need to be in place first: a DPA with the hosting provider, zero data retention on the API side, and proper access controls. A demo tool is not the right place to handle governance documents.</p>
-      </div>
-
-      <div class="card">
-        <p class="card-label">Architecture in plain language</p>
-        <p>The tool runs two flows.</p>
-        <p><strong>Classification:</strong></p>
-        <div class="flow">
-          <div class="flow-step"><span class="flow-num">1</span>The user types a task</div>
-          <div class="flow-arrow">↓</div>
-          <div class="flow-step"><span class="flow-num">2</span>The browser sends it to the Claude API</div>
-          <div class="flow-arrow">↓</div>
-          <div class="flow-step"><span class="flow-num">3</span>Claude returns a classification (Assist / Automate / Avoid) with reasoning</div>
-          <div class="flow-arrow">↓</div>
-          <div class="flow-step"><span class="flow-num">4</span>The user reviews, edits if needed, and confirms</div>
-          <div class="flow-arrow">↓</div>
-          <div class="flow-step"><span class="flow-num">5</span>The browser sends the confirmed version to the server, which saves it to a local file</div>
+      <div class="card card-accent collapsible-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <p class="card-label">The problem it solves</p>
+          <span class="card-arrow">▼</span>
         </div>
-        <p style="margin-top: 16px;"><strong>Export:</strong> Confirmed decisions accumulate in a ledger visible in the tool. When the user hits Download CSV, the browser converts the ledger data it already holds into a CSV file locally, and the file downloads directly without another server round-trip. That client-side generation is a deliberate choice: it keeps the export fast and reduces unnecessary server load.</p>
+        <div class="card-body">
+          <p>Most teams know they should think carefully about where AI belongs in their work, but in practice every decision happens ad hoc, inconsistently, and gets lost. A³ helps individuals and teams decide, for any given task, whether to use AI assistance, avoid it, or automate it fully.</p>
+          <p>The output is not just a recommendation: it builds into a living decision ledger that becomes the team's practical AI governance, without anyone having to dig through policy documents or ask around.</p>
+        </div>
       </div>
 
-      <div class="card card-highlight">
-        <p class="card-label">What it is not ready for yet</p>
-        <p>To handle real organisational data, this tool would need: authentication (SSO or email-based login), a Data Processing Agreement with the hosting provider, Anthropic Enterprise API terms with zero data retention enabled, encrypted storage, and audit logging that tracks usage without retaining document content.</p>
-        <p>GDPR compliance would also require confirming EU data residency. None of this is complex in principle, but all of it needs to be in place before an org uploads anything sensitive.</p>
+      <div class="card collapsible-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <p class="card-label">Design choices and tradeoffs</p>
+          <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+          <p>I prioritized a functional MVP over polish: no custom design, straightforward React, no database at this stage. Two deliberate omissions worth naming.</p>
+          <p>I did not add a database (PostgreSQL would be the natural next step) because I wanted to validate the core logic before adding infrastructure complexity. And I removed document upload, even though it would make recommendations more contextual, because I am aware of the data handling requirements that would need to be in place first: a DPA with the hosting provider, zero data retention on the API side, and proper access controls. A demo tool is not the right place to handle governance documents.</p>
+        </div>
       </div>
 
-      <div class="card">
-        <p class="card-label">How it would scale</p>
-        <p>The sequence matters: security and authentication first, then database, then document upload with proper data handling in place, then expanding toward a conversational interface where teams can query their own AI governance history.</p>
-        <p>The goal is a lightweight internal tool that gives organisations a practical, evolving answer to the question of how to use AI — without needing a consultant every time.</p>
-      </div>
-
-      <div class="card">
-        <p class="card-label">Reflection</p>
-        <p>Building this iteratively with Claude Code taught me something useful about AI-assisted development: the limiting factor is not the tool, it is the clarity of your own thinking. The moments where the output surprised me were usually moments where I had not been precise enough about what I actually wanted.</p>
-      </div>
-
-      <div class="card">
-        <p class="card-label">Model card</p>
-        <p style="margin-bottom: 16px;">This tool runs on <strong>Claude Sonnet 4.6</strong>, built by Anthropic.</p>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Good at</span>
-            <span class="mc-arrow">▶</span>
+      <div class="card collapsible-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <p class="card-label">Architecture in plain language</p>
+          <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+          <p>The tool runs two flows.</p>
+          <p><strong>Classification:</strong></p>
+          <div class="flow">
+            <div class="flow-step"><span class="flow-num">1</span>The user types a task</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step"><span class="flow-num">2</span>The browser sends it to the Claude API</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step"><span class="flow-num">3</span>Claude returns a classification (Assist / Automate / Avoid) with reasoning</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step"><span class="flow-num">4</span>The user reviews, edits if needed, and confirms</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step"><span class="flow-num">5</span>The browser sends the confirmed version to the server, which saves it to a local file</div>
           </div>
-          <div class="mc-body">Understanding how you describe a task, applying a consistent classification, and explaining why.</div>
-        </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Watch out for</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body">Vague task descriptions lead to less reliable results. The model does not know your organisation's specific context unless you tell it.</div>
-        </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Safety</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body">Refused over 98% of harmful requests in Anthropic's testing. Deployed at AI Safety Level 2.</div>
-        </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Your role</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body">Every classification needs your review and confirmation before it saves. The model suggests, you decide.</div>
-        </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Data</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body">Your inputs are sent to the Anthropic API and not stored between sessions. Do not enter personal or confidential data.</div>
-        </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Full details</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body"><a href="https://www.anthropic.com/research/claude-4-system-card" target="_blank" rel="noopener">Anthropic Claude 4 System Card</a></div>
+          <p style="margin-top: 16px;"><strong>Export:</strong> Confirmed decisions accumulate in a ledger visible in the tool. When the user hits Download CSV, the browser converts the ledger data it already holds into a CSV file locally, and the file downloads directly without another server round-trip. That client-side generation is a deliberate choice: it keeps the export fast and reduces unnecessary server load.</p>
         </div>
       </div>
 
-      <div class="card">
-        <p class="card-label">Credits</p>
-        <p>The A³ framework (Assist / Automate / Avoid) was developed by <span class="credit-name">Stefan Wolpers</span> and is documented at <a href="https://age-of-product.com" target="_blank" rel="noopener">Age of Product</a>. This tool is a practical implementation of that framework, built to make the classification process interactive and to turn individual decisions into a cumulative team resource.</p>
+      <div class="card card-highlight collapsible-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <p class="card-label">What it is not ready for yet</p>
+          <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+          <p>To handle real organisational data, this tool would need: authentication (SSO or email-based login), a Data Processing Agreement with the hosting provider, Anthropic Enterprise API terms with zero data retention enabled, encrypted storage, and audit logging that tracks usage without retaining document content.</p>
+          <p>GDPR compliance would also require confirming EU data residency. None of this is complex in principle, but all of it needs to be in place before an org uploads anything sensitive.</p>
+        </div>
+      </div>
+
+      <div class="card collapsible-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <p class="card-label">How it would scale</p>
+          <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+          <p>The sequence matters: security and authentication first, then database, then document upload with proper data handling in place, then expanding toward a conversational interface where teams can query their own AI governance history.</p>
+          <p>The goal is a lightweight internal tool that gives organisations a practical, evolving answer to the question of how to use AI — without needing a consultant every time.</p>
+        </div>
+      </div>
+
+      <div class="card collapsible-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <p class="card-label">Reflection</p>
+          <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+          <p>Building this iteratively with Claude Code taught me something useful about AI-assisted development: the limiting factor is not the tool, it is the clarity of your own thinking. The moments where the output surprised me were usually moments where I had not been precise enough about what I actually wanted.</p>
+        </div>
+      </div>
+
+      <div class="card collapsible-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <p class="card-label">Model card</p>
+          <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+          <p>This tool runs on <strong>Claude Sonnet 4.6</strong>, built by Anthropic.</p>
+          <table class="model-card-table">
+            <tbody>
+              <tr>
+                <td class="mc-key">Good at</td>
+                <td>Understanding how you describe a task, applying a consistent classification, and explaining why.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Watch out for</td>
+                <td>Vague task descriptions lead to less reliable results. The model does not know your organisation's specific context unless you tell it.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Safety</td>
+                <td>Refused over 98% of harmful requests in Anthropic's testing. Deployed at AI Safety Level 2.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Your role</td>
+                <td>Every classification needs your review and confirmation before it saves. The model suggests, you decide.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Data</td>
+                <td>Your inputs are sent to the Anthropic API and not stored between sessions. Do not enter personal or confidential data.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Full details</td>
+                <td><a href="https://www.anthropic.com/research/claude-4-system-card" target="_blank" rel="noopener">Anthropic Claude 4 System Card</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card collapsible-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <p class="card-label">Credits</p>
+          <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+          <p>The A³ framework (Assist / Automate / Avoid) was developed by <span class="credit-name">Stefan Wolpers</span> and is documented at <a href="https://age-of-product.com" target="_blank" rel="noopener">Age of Product</a>. This tool is a practical implementation of that framework, built to make the classification process interactive and to turn individual decisions into a cumulative team resource.</p>
+        </div>
       </div>
 
     </div>
@@ -155,9 +175,9 @@
   </footer>
 
   <script>
-    function toggleMC(toggle) {
-      const body = toggle.nextElementSibling;
-      const arrow = toggle.querySelector('.mc-arrow');
+    function toggleCard(header) {
+      const body = header.nextElementSibling;
+      const arrow = header.querySelector('.card-arrow');
       const isOpen = body.classList.contains('open');
       body.classList.toggle('open', !isOpen);
       arrow.classList.toggle('open', !isOpen);
