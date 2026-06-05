@@ -484,6 +484,53 @@ footer {
 }
 .card-body.open { display: block; }
 
+/* ── Model card items ──────────────────────────────────────────────────── */
+.mc-item { margin-bottom: 6px; }
+
+.mc-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  user-select: none;
+  border: 1px solid var(--border);
+  background: var(--white);
+}
+.mc-toggle:hover { background: var(--light); }
+
+.mc-toggle-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.mc-arrow {
+  font-size: 10px;
+  color: var(--grey);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.mc-arrow.open { transform: rotate(90deg); }
+
+.mc-body {
+  display: none;
+  font-size: 0.88rem;
+  color: #333;
+  line-height: 1.7;
+  padding: 10px 14px 14px;
+  margin-top: -6px;
+  background: var(--light);
+  border-radius: 0 0 6px 6px;
+  border: 1px solid var(--border);
+  border-top: none;
+}
+.mc-body.open { display: block; }
+
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .hero h1 { font-size: 1.8rem; }
