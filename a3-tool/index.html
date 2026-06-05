@@ -116,56 +116,41 @@
         </div>
       </div>
 
-      <div class="card">
-        <p class="card-label">Model card</p>
-        <p>This tool runs on <strong>Claude Sonnet 4.6</strong>, built by Anthropic.</p>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Good at</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body">Understanding how you describe a task, applying a consistent classification, and explaining why.</div>
+      <div class="card collapsible-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <p class="card-label">Model card</p>
+          <span class="card-arrow">▼</span>
         </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Watch out for</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body">Vague task descriptions lead to less reliable results. The model does not know your organisation's specific context unless you tell it.</div>
-        </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Safety</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body">Refused over 98% of harmful requests in Anthropic's testing. Deployed at AI Safety Level 2.</div>
-        </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Your role</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body">Every classification needs your review and confirmation before it saves. The model suggests, you decide.</div>
-        </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Data</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body">Your inputs are sent to the Anthropic API and not stored between sessions. Do not enter personal or confidential data.</div>
-        </div>
-
-        <div class="mc-item">
-          <div class="mc-toggle" onclick="toggleMC(this)">
-            <span class="mc-toggle-label">Full details</span>
-            <span class="mc-arrow">▶</span>
-          </div>
-          <div class="mc-body"><a href="https://www.anthropic.com/research/claude-4-system-card" target="_blank" rel="noopener">Anthropic Claude 4 System Card</a></div>
+        <div class="card-body">
+          <p>This tool runs on <strong>Claude Sonnet 4.6</strong>, built by Anthropic.</p>
+          <table class="model-card-table">
+            <tbody>
+              <tr>
+                <td class="mc-key">Good at</td>
+                <td>Understanding how you describe a task, applying a consistent classification, and explaining why.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Watch out for</td>
+                <td>Vague task descriptions lead to less reliable results. The model does not know your organisation's specific context unless you tell it.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Safety</td>
+                <td>Refused over 98% of harmful requests in Anthropic's testing. Deployed at AI Safety Level 2.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Your role</td>
+                <td>Every classification needs your review and confirmation before it saves. The model suggests, you decide.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Data</td>
+                <td>Your inputs are sent to the Anthropic API and not stored between sessions. Do not enter personal or confidential data.</td>
+              </tr>
+              <tr>
+                <td class="mc-key">Full details</td>
+                <td><a href="https://www.anthropic.com/research/claude-4-system-card" target="_blank" rel="noopener">Anthropic Claude 4 System Card</a></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -193,14 +178,6 @@
     function toggleCard(header) {
       const body = header.nextElementSibling;
       const arrow = header.querySelector('.card-arrow');
-      const isOpen = body.classList.contains('open');
-      body.classList.toggle('open', !isOpen);
-      arrow.classList.toggle('open', !isOpen);
-    }
-
-    function toggleMC(toggle) {
-      const body = toggle.nextElementSibling;
-      const arrow = toggle.querySelector('.mc-arrow');
       const isOpen = body.classList.contains('open');
       body.classList.toggle('open', !isOpen);
       arrow.classList.toggle('open', !isOpen);
