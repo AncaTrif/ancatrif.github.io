@@ -416,6 +416,39 @@ footer {
   color: var(--black);
 }
 
+/* ── Model card table ───────────────────────────────────────────────────── */
+.model-card-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.model-card-table tr {
+  border-bottom: 1px solid var(--border);
+}
+.model-card-table tr:last-child {
+  border-bottom: none;
+}
+
+.model-card-table td {
+  padding: 10px 0;
+  vertical-align: top;
+  line-height: 1.65;
+  color: #333;
+}
+
+.mc-key {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+  white-space: nowrap;
+  padding-right: 24px;
+  width: 1%;
+}
+
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .hero h1 { font-size: 1.8rem; }
