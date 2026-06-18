@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Self-Service Agent · Anca Trif</title>
+<meta name="description" content="A proof-of-concept agentic workflow testing whether employees can get satisfactory HR answers from an AI agent, without HR needing to be in the loop.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Roboto+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAF8F4;
+    --paper-raised: #FFFFFF;
+    --ink: #1F2A24;
+    --ink-soft: #5B655F;
+    --ink-faint: #94998F;
+    --sage: #5C7C6B;
+    --sage-light: #E4ECE6;
+    --sage-dark: #3E5849;
+    --coral: #C2542F;
+    --coral-dark: #9A3F22;
+    --line: #E2DDD3;
+    --line-soft: #ECE8DF;
+    --warn-bg: #FBEFE6;
+    --warn-text: #8A4A1F;
+    --code-bg: #F1EEE5;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+
+  .topbar {
+    border-bottom: 1px solid var(--line);
+    background: var(--paper-raised);
+    padding: 1rem 1.5rem;
+  }
+
+  .topbar-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .topbar-inner a { color: var(--ink); text-decoration: none; }
+  .topbar-inner a:hover { color: var(--sage-dark); }
+  .topbar-name { font-weight: 500; }
+  .topbar-links { display: flex; gap: 1.25rem; color: var(--ink-soft); }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    margin-bottom: 2rem;
+  }
+  .back-link:hover { color: var(--sage-dark); }
+
+  h1 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 34px;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+  }
+
+  .meta-line {
+    font-size: 13.5px;
+    color: var(--ink-faint);
+    margin: 0 0 1.5rem;
+  }
+
+  .lede {
+    font-size: 17px;
+    color: var(--ink-soft);
+    margin: 0 0 2rem;
+    line-height: 1.6;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cta-primary {
+    background: var(--coral);
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0.65rem 1.2rem;
+    border-radius: 7px;
+    transition: background 0.15s ease;
+  }
+  .cta-primary:hover { background: var(--coral-dark); }
+
+  .cta-secondary {
+    border: 1px solid var(--line);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0.65rem 1.2rem;
+    border-radius: 7px;
+    background: var(--paper-raised);
+  }
+  .cta-secondary:hover { border-color: var(--sage); color: var(--sage-dark); }
+
+  .demo-note {
+    background: var(--warn-bg);
+    color: var(--warn-text);
+    font-size: 13.5px;
+    padding: 0.85rem 1.1rem;
+    border-radius: 8px;
+    margin-bottom: 2.5rem;
+    line-height: 1.55;
+  }
+
+  section { margin-bottom: 0.5rem; }
+
+  section {
+    margin-bottom: 0.85rem;
+  }
+
+  .section-toggle {
+    width: 100%;
+    text-align: left;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+    transition: border-color 0.15s ease;
+  }
+
+  .section-toggle:hover { border-color: var(--sage); }
+
+  .section-toggle[aria-expanded="true"] {
+    background: #D8F0E3;
+    border-color: #A9DDC4;
+  }
+
+  .section-title {
+    font-family: 'Roboto Mono', 'SF Mono', Menlo, monospace;
+    font-size: 13.5px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .section-chevron {
+    color: var(--ink-faint);
+    font-size: 13px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    margin-left: 1rem;
+  }
+
+  .section-toggle[aria-expanded="true"] .section-chevron { transform: rotate(180deg); }
+
+  .section-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+    font-size: 15.5px;
+    color: var(--ink-soft);
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    margin-top: -0.85rem;
+  }
+
+  .section-body p { margin: 0 0 1rem; }
+  .section-body p:last-child { margin-bottom: 0; }
+  .section-body strong { color: var(--ink); font-weight: 500; }
+
+  .section-body[hidden] { display: none; }
+
+  .flow-step {
+    display: flex;
+    gap: 0.9rem;
+    margin-bottom: 0.9rem;
+    align-items: baseline;
+  }
+
+  .flow-num {
+    background: var(--sage-light);
+    color: var(--sage-dark);
+    font-size: 12.5px;
+    font-weight: 500;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .flow-arrow {
+    color: var(--ink-faint);
+    font-size: 13px;
+    margin: 0.25rem 0 0.25rem 11px;
+  }
+
+  .diagram-wrap {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.5rem 1rem;
+    margin: 1.25rem 0;
+  }
+
+  .screenshot-wrap {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1.25rem 0;
+  }
+
+  .screenshot-wrap img { width: 100%; display: block; }
+
+  .screenshot-caption {
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    padding: 0.6rem 0.9rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .screenshot-placeholder {
+    background: var(--code-bg);
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 13.5px;
+    margin: 1.25rem 0;
+  }
+
+  .table-wrap { overflow-x: auto; margin: 1.25rem 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  th {
+    color: var(--ink-faint);
+    font-weight: 500;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--code-bg);
+  }
+
+  td { color: var(--ink-soft); }
+  td:first-child { color: var(--ink); font-weight: 500; white-space: nowrap; }
+
+  .bug-callout {
+    background: var(--sage-light);
+    border-left: 2px solid var(--sage);
+    border-radius: 0 8px 8px 0;
+    padding: 0.9rem 1.1rem;
+    margin: 1.25rem 0;
+    font-size: 14.5px;
+  }
+
+  .bug-callout code {
+    background: var(--code-bg);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .footer {
+    border-top: 1px solid var(--line);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  .footer a { color: var(--sage-dark); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="https://ancatrif.com/" class="topbar-name">Anca Trif</a>
+    <div class="topbar-links">
+      <a href="https://ancatrif.com/#about">About</a>
+      <a href="https://ancatrif.com/#projects">Projects</a>
+      <a href="https://www.linkedin.com/in/ancatrif">LinkedIn</a>
+    </div>
+  </div>
+</div>
+
+<main>
+  <a href="https://ancatrif.com/" class="back-link">← Back to portfolio</a>
+
+  <h1>HR self-service agent</h1>
+  <p class="meta-line">AI · Automation · n8n · Claude 2026</p>
+
+  <p class="lede">
+    A proof-of-concept agentic workflow testing one specific assumption: that an employee can get a satisfactory answer to a routine HR question from an AI agent often enough that HR doesn't need to be in the loop. Built end to end in n8n — webhook, data lookup, prompt assembly, Claude, logging, response.
+  </p>
+
+  <div class="cta-row">
+    <a href="https://hr-self-service-poc.onrender.com/" class="cta-primary">Try the demo →</a>
+    <a href="https://www.linkedin.com/in/ancatrif" class="cta-secondary">Ask me about it</a>
+  </div>
+
+  <div class="demo-note">
+    <strong>This is a demo with synthetic data.</strong> All 20 employee records, names, and balances are made up — no real company, no real HR data. The point is to test the mechanism, not to represent any actual organisation.
+  </div>
+
+  <section>
+    <button class="section-toggle" aria-expanded="false" data-target="problem">
+      <span class="section-title">The problem it solves</span>
+      <span class="section-chevron">▼</span>
+    </button>
+    <div class="section-body hidden" id="problem">
+      <p>HR teams spend a meaningful share of their week answering the same handful of questions — how many vacation days are left, where the handbook lives, what the remote work policy says. None of it is hard to answer. All of it is repetitive enough to keep HR reactive instead of strategic.</p>
+      <p>The core assumption worth testing isn't whether AI <em>can</em> answer these questions — it's whether employees will actually accept the answer often enough that they don't immediately escalate to a human anyway. That's the only thing this PoC is built to find out. Everything else — polish, integration breadth, UI — is secondary until that's true.</p>
+    </div>
+  </section>
+
+  <section>
+    <button class="section-toggle" aria-expanded="false" data-target="approach">
+      <span class="section-title">Design choices and tradeoffs</span>
+      <span class="section-chevron">▼</span>
+    </button>
+    <div class="section-body hidden" id="approach">
+      <p>The brief explicitly called for buying information, not building software. That shaped every decision: no authentication, no production HRIS integration, no polished UI at the backend stage. The fastest path to a real answer was to fake the hard parts and test the real part.</p>
+      <p>Two deliberate omissions worth naming. A manually populated spreadsheet stands in for a live HRIS connection (Workday, BambooHR) — wiring up a real one would have taken weeks and told me nothing about whether the agent's answers are good. And five policy documents are pasted directly into the system prompt rather than chunked into a vector database, since five documents under 10k tokens don't need retrieval infrastructure yet. Both would be wrong choices in production, and both are exactly right for a two-week test.</p>
+    </div>
+  </section>
+
+  <section>
+    <button class="section-toggle" aria-expanded="false" data-target="architecture">
+      <span class="section-title">Architecture in plain language</span>
+      <span class="section-chevron">▼</span>
+    </button>
+    <div class="section-body hidden" id="architecture">
+      <p>The workflow runs as a single n8n pipeline triggered by a webhook. Six nodes, no framework, no custom backend.</p>
+
+      <div class="flow-step"><div class="flow-num">1</div><div><strong>Webhook trigger</strong> — receives a POST request containing an employee ID and a question.</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">2</div><div><strong>Google Sheets lookup</strong> — fetches the row matching that employee ID from a spreadsheet of 20 synthetic records.</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">3</div><div><strong>Code node</strong> — assembles a system prompt combining the employee's record with the relevant policy text.</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">4</div><div><strong>Claude Sonnet 4.6</strong> — answers the question, grounded only in the data it was given, instructed to decline anything outside that scope.</div></div>
+      <div class="flow-arrow">↓ splits into two parallel branches</div>
+      <div class="flow-step"><div class="flow-num">5a</div><div><strong>Respond to webhook</strong> — returns the answer as the HTTP response immediately.</div></div>
+      <div class="flow-step"><div class="flow-num">5b</div><div><strong>Logging</strong> — appends timestamp, employee ID, question, and answer to a separate sheet for review.</div></div>
+
+      <div class="diagram-wrap">
+        <svg width="100%" viewBox="0 0 680 660" role="img">
+          <title>n8n workflow diagram</title>
+          <desc>Four nodes in sequence — webhook trigger, Google Sheets lookup, code node, Claude — then two parallel branches: respond to webhook, and logging.</desc>
+          <defs><marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5C7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+          <g><rect x="190" y="20" width="300" height="52" rx="8" fill="#EEEDFE" stroke="#3C3489" stroke-width="0.5"/>
+          <text x="340" y="40" text-anchor="middle" font-size="14" font-weight="500" fill="#26215C" font-family="Inter, sans-serif">Webhook trigger</text>
+          <text x="340" y="58" text-anchor="middle" font-size="12" fill="#3C3489" font-family="Inter, sans-serif">employee_id + question in</text></g>
+          <line x1="340" y1="72" x2="340" y2="112" stroke="#5C7C6B" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g><rect x="190" y="112" width="300" height="52" rx="8" fill="#E1F5EE" stroke="#085041" stroke-width="0.5"/>
+          <text x="340" y="132" text-anchor="middle" font-size="14" font-weight="500" fill="#04342C" font-family="Inter, sans-serif">Google Sheets lookup</text>
+          <text x="340" y="150" text-anchor="middle" font-size="12" fill="#085041" font-family="Inter, sans-serif">finds matching employee record</text></g>
+          <line x1="340" y1="164" x2="340" y2="204" stroke="#5C7C6B" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g><rect x="190" y="204" width="300" height="52" rx="8" fill="#FAECE7" stroke="#712B13" stroke-width="0.5"/>
+          <text x="340" y="224" text-anchor="middle" font-size="14" font-weight="500" fill="#4A1B0C" font-family="Inter, sans-serif">Code node</text>
+          <text x="340" y="242" text-anchor="middle" font-size="12" fill="#712B13" font-family="Inter, sans-serif">assembles the system prompt</text></g>
+          <line x1="340" y1="256" x2="340" y2="296" stroke="#5C7C6B" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g><rect x="190" y="296" width="300" height="52" rx="8" fill="#E6F1FB" stroke="#0C447C" stroke-width="0.5"/>
+          <text x="340" y="316" text-anchor="middle" font-size="14" font-weight="500" fill="#042C53" font-family="Inter, sans-serif">Claude Sonnet 4.6</text>
+          <text x="340" y="334" text-anchor="middle" font-size="12" fill="#0C447C" font-family="Inter, sans-serif">answers from record + policies</text></g>
+          <path d="M340 348 V370 Q340 380 350 380 H488" fill="none" stroke="#5C7C6B" stroke-width="1" marker-end="url(#arrow2)"/>
+          <path d="M340 348 V430 Q340 440 350 440 H488" fill="none" stroke="#5C7C6B" stroke-width="1" marker-end="url(#arrow2)"/>
+          <text x="400" y="372" font-size="12" fill="#94998F" font-family="Inter, sans-serif">parallel</text>
+          <g><rect x="490" y="354" width="160" height="52" rx="8" fill="#EEEDFE" stroke="#3C3489" stroke-width="0.5"/>
+          <text x="570" y="374" text-anchor="middle" font-size="13" font-weight="500" fill="#26215C" font-family="Inter, sans-serif">Respond to webhook</text>
+          <text x="570" y="392" text-anchor="middle" font-size="11" fill="#3C3489" font-family="Inter, sans-serif">returns the reply</text></g>
+          <g><rect x="490" y="414" width="160" height="52" rx="8" fill="#EAF3DE" stroke="#27500A" stroke-width="0.5"/>
+          <text x="570" y="434" text-anchor="middle" font-size="13" font-weight="500" fill="#173404" font-family="Inter, sans-serif">Logging</text>
+          <text x="570" y="452" text-anchor="middle" font-size="11" fill="#27500A" font-family="Inter, sans-serif">appends to a sheet</text></g>
+          <rect x="60" y="510" width="560" height="70" rx="8" fill="none" stroke="#E2DDD3" stroke-width="0.5"/>
+          <text x="340" y="535" text-anchor="middle" font-size="12" fill="#94998F" font-family="Inter, sans-serif">The reply goes out the moment Claude responds — logging</text>
+          <text x="340" y="553" text-anchor="middle" font-size="12" fill="#94998F" font-family="Inter, sans-serif">happens independently and never delays what the employee sees.</text>
+        </svg>
+      </div>
+
+      <div class="screenshot-wrap">
+        <img src="n8n-canvas.png" alt="The live n8n workflow canvas, showing six connected nodes: Webhook, Get row(s) in sheet, Code in JavaScript, Message a model, Append row in sheet, and Respond to Webhook, all marked as successfully executed.">
+        <div class="screenshot-caption">The actual n8n canvas. Logging and the webhook response both fire directly off the Claude node, in parallel.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <button class="section-toggle" aria-expanded="false" data-target="not-ready">
+      <span class="section-title">What it is not ready for yet</span>
+      <span class="section-chevron">▼</span>
+    </button>
+    <div class="section-body hidden" id="not-ready">
+      <p>To handle real employee data, this would need several things that are deliberately absent right now.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Gap</th><th>Why it matters</th></tr>
+          <tr><td>SSO authentication</td><td>Right now the employee ID is typed by hand, which means anyone can request anyone's data. Identity needs to come from a login token, not user input.</td></tr>
+          <tr><td>Live HRIS connection</td><td>The Google Sheet is a stand-in. Real deployment needs a Workday or BambooHR API call so the data stays current and is only writable by HR systems.</td></tr>
+          <tr><td>Rate limiting</td><td>An open webhook with no limits can be hit repeatedly, running up API costs with no benefit.</td></tr>
+          <tr><td>Audit logging tied to identity</td><td>The current log captures the exchange, but not a verified identity — in an HR context, auditability is not optional.</td></tr>
+          <tr><td>Vector store for policies</td><td>Pasting five documents into a system prompt works at this scale. Fifty documents would need retrieval, not inlining.</td></tr>
+        </table>
+      </div>
+      <p>None of this is complex in principle. All of it needs to be in place before any real employee record touches the system.</p>
+    </div>
+  </section>
+
+  <section>
+    <button class="section-toggle" aria-expanded="false" data-target="scale">
+      <span class="section-title">How it would scale</span>
+      <span class="section-chevron">▼</span>
+    </button>
+    <div class="section-body hidden" id="scale">
+      <p>The sequence matters: identity and access control first, then a live data connection, then retrieval for the policy library, then — only once the foundation holds — additional surfaces like Slack or a richer chat interface.</p>
+      <p>The architecture itself doesn't need to change much as it scales. The same six-step shape — receive, look up, assemble context, ask the model, log, respond — holds whether the data source is a spreadsheet or an enterprise HRIS, and whether five documents are inlined or fifty are retrieved from a vector store.</p>
+    </div>
+  </section>
+
+  <section>
+    <button class="section-toggle" aria-expanded="false" data-target="reflection">
+      <span class="section-title">Reflection</span>
+      <span class="section-chevron">▼</span>
+    </button>
+    <div class="section-body hidden" id="reflection">
+      <p>Building this in n8n rather than from scratch in code surfaced a different kind of learning than I expected. The logic was never the hard part — the friction was almost always in the gap between what a node's interface implies it does and what it actually expects as input. That's a different debugging muscle than reading a stack trace: it means testing one node at a time and trusting the output panel over your assumptions about how a field should behave.</p>
+    </div>
+  </section>
+
+  <section>
+    <button class="section-toggle" aria-expanded="false" data-target="model-card">
+      <span class="section-title">Model card</span>
+      <span class="section-chevron">▼</span>
+    </button>
+    <div class="section-body hidden" id="model-card">
+      <p>This workflow runs on <strong>Claude Sonnet 4.6</strong>, built by Anthropic.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><td>Good at</td><td>Answering narrowly within the data it's given, and declining clearly when something falls outside that scope.</td></tr>
+          <tr><td>Watch out for</td><td>The agent only knows what's in its system prompt. It has no way to verify the employee ID is real — that check has to happen before the model is ever called.</td></tr>
+          <tr><td>Safety</td><td>Refused over 98% of harmful requests in Anthropic's testing. Deployed at AI Safety Level 2.</td></tr>
+          <tr><td>Your role</td><td>Every response in this PoC is logged for review, not auto-trusted. A human checks the log to see where the agent's answers are reliable and where they're not.</td></tr>
+          <tr><td>Data</td><td>Inputs are synthetic and sent to the Anthropic API. No real employee data is used anywhere in this demo.</td></tr>
+          <tr><td>Full details</td><td><a href="https://www.anthropic.com/research/claude-4-system-card">Anthropic Claude 4 System Card</a></td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <button class="section-toggle" aria-expanded="false" data-target="credits">
+      <span class="section-title">Credits</span>
+      <span class="section-chevron">▼</span>
+    </button>
+    <div class="section-body hidden" id="credits">
+      <p>Built in n8n, an open-source workflow automation tool, connected to the Anthropic API. The data and policy documents are entirely synthetic, written for this demo and not drawn from any real company.</p>
+    </div>
+  </section>
+
+  <div class="footer">
+    Anca Trif · <a href="https://www.linkedin.com/in/ancatrif">LinkedIn</a> · <a href="https://ancatrif.substack.com">Substack</a>
+  </div>
+</main>
+
+<script>
+  document.querySelectorAll('.section-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      target.hidden = expanded;
+    });
+  });
+</script>
+
+</body>
+</html>
