@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Loop — Facilitator Review</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.23.0/babel.min.js"></script>
+  <style>
+    :root {
+      --bg: #faf9f7; --card: #ffffff; --border: #e8e4dd; --border-soft: #f0ece5;
+      --text: #2a2722; --text-2: #6b6459; --text-3: #9b9488;
+      --coral: #c4462f; --coral-bg: #fbeae6; --amber: #b8791a; --amber-bg: #fbf2e2;
+      --teal: #2f7d6e; --teal-bg: #e4f1ed; --info-bg: #eef1f6; --info-text: #3a5a8c;
+      --radius: 10px; --radius-sm: 6px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); font-family: var(--sans); color: var(--text); line-height: 1.5; }
+    .wrap { max-width: 940px; margin: 0 auto; padding: 40px 24px 80px; }
+    .layout { display: flex; gap: 24px; align-items: flex-start; }
+    .rail { width: 190px; flex-shrink: 0; position: sticky; top: 24px; }
+    .rail-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-3); margin: 0 0 10px; }
+    .rail-empty { font-size: 12px; color: var(--text-3); line-height: 1.5; }
+    .ver { border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 8px; cursor: pointer; background: var(--card); transition: border-color .12s; }
+    .ver:hover { border-color: var(--border-secondary); }
+    .ver.active { border-color: var(--text-2); background: var(--bg); }
+    .ver .vh { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
+    .ver .vn { font-size: 13px; font-weight: 600; color: var(--text); }
+    .ver .vt { font-size: 11px; color: var(--text-3); }
+    .ver .vr { font-size: 12px; color: var(--text-2); margin-top: 3px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ver .vr.open { white-space: normal; overflow: visible; text-overflow: clip; }
+    .ver .vtag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 4px; margin-top: 5px; background: var(--info-bg); color: var(--info-text); }
+    .ver .vtag.approved { background: var(--teal-bg); color: var(--teal); }
+    .main { flex: 1; min-width: 0; }
+    .rail-note { font-size: 11px; color: var(--text-3); line-height: 1.5; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-soft); }
+    .title-row { margin-bottom: 20px; }
+    h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+    .subtitle { font-size: 14px; color: var(--text-2); margin: 0; }
+    .demo-note { background: var(--info-bg); color: var(--info-text); font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 20px; line-height: 1.5; }
+    .controls { background: var(--card); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 16px; margin-bottom: 24px; }
+    .control-row { display: flex; gap: 8px; align-items: flex-end; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field.grow { flex: 1; }
+    label { font-size: 12px; font-weight: 500; color: var(--text-2); display: flex; align-items: center; gap: 5px; }
+    input[type=text], textarea, select {
+      font-family: var(--sans); font-size: 14px; padding: 9px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--card); color: var(--text); outline: none; width: 100%;
+    }
+    input[type=text]:focus, textarea:focus, select:focus { border-color: var(--text-3); }
+    button {
+      font-family: var(--sans); font-size: 14px; font-weight: 500; padding: 9px 16px;
+      border: none; border-radius: var(--radius-sm); background: var(--text); color: #fff;
+      cursor: pointer; white-space: nowrap;
+    }
+    button:disabled { opacity: 0.5; cursor: default; }
+    button.secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+    .live-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); margin-bottom: 14px; cursor: pointer; user-select: none; }
+    .switch { position: relative; width: 34px; height: 19px; background: var(--border); border-radius: 10px; transition: background .2s; flex-shrink: 0; }
+    .switch.on { background: var(--teal); }
+    .switch .knob { position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; background: #fff; border-radius: 50%; transition: transform .2s; }
+    .switch.on .knob { transform: translateX(15px); }
+    .tip { position: relative; display: inline-flex; align-items: center; }
+    .tip .q { width: 14px; height: 14px; border-radius: 50%; background: var(--text-3); color: #fff; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: help; font-weight: 600; }
+    .tip .bubble { visibility: hidden; opacity: 0; position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%); width: 230px; background: var(--text); color: #fff; font-size: 12px; font-weight: 400; line-height: 1.45; padding: 8px 10px; border-radius: var(--radius-sm); z-index: 10; transition: opacity 0.15s; }
+    .tip:hover .bubble { visibility: visible; opacity: 1; }
+    .msg { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 20px; }
+    .msg.error { background: var(--coral-bg); color: var(--coral); }
+    .msg.warn { background: var(--amber-bg); color: var(--amber); display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+    .msg.warn .warn-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .msg.warn button { padding: 5px 12px; font-size: 13px; }
+    .empty { padding: 48px 24px; text-align: center; color: var(--text-2); font-size: 14px; }
+    .brief-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-soft); }
+    .brief-head .t { font-weight: 600; font-size: 15px; margin: 0; }
+    .brief-head .d { font-size: 12px; color: var(--text-3); margin: 2px 0 0; }
+    .badge { font-size: 12px; padding: 3px 10px; border-radius: var(--radius-sm); background: #f0ece5; color: var(--text-2); }
+    .badge.approved { background: var(--teal-bg); color: var(--teal); }
+    .badge.edited { background: var(--info-bg); color: var(--info-text); }
+    .section-head { display: flex; align-items: center; gap: 8px; margin: 22px 0 10px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .dot.lead { background: var(--coral); } .dot.watch { background: var(--amber); } .dot.fyi { background: var(--teal); }
+    .section-label { font-size: 13px; font-weight: 600; color: var(--text-2); }
+    .card { background: var(--card); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+    .editable { cursor: text; padding: 2px 4px; margin: -2px -4px; border-radius: 4px; }
+    .editable:hover { background: var(--bg); }
+    .card-title { font-size: 15px; font-weight: 600; }
+    .card-body { font-size: 14px; margin-top: 6px; color: var(--text); }
+    .pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .pill { font-size: 12px; padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text-2); cursor: pointer; }
+    .pill.open { background: var(--info-bg); color: var(--info-text); border-color: var(--info-text); }
+    .pill-jira { border-color: #cdd9ec; } .pill-confluence_retro, .pill-confluence_decision { border-color: #cfe0da; }
+    .pill-intercom { border-color: #e6d4c4; } .pill-marketing { border-color: #e3d2e0; } .pill-slack { border-color: #d9d2e6; }
+    .source-panel { margin-top: 8px; padding: 10px 12px; background: var(--bg); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-2); }
+    .source-meta { display: flex; gap: 8px; margin-bottom: 6px; font-size: 12px; flex-wrap: wrap; }
+    .source-meta .strong { font-weight: 600; color: var(--text); }
+    .source-content { white-space: pre-wrap; font-family: var(--mono); font-size: 12px; line-height: 1.6; }
+    .actions { display: flex; gap: 8px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-soft); flex-wrap: wrap; }
+    .actions button:first-child { flex: 1; min-width: 160px; }
+    .hint { font-size: 12px; color: var(--text-3); margin-top: 12px; text-align: center; }
+    textarea { width: 100%; line-height: 1.5; }
+    input.inline-edit { width: 100%; }
+    .obs-row { display: flex; gap: 8px; align-items: flex-end; margin-top: 22px; }
+    .pub { margin-top: 24px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .pub-bar { background: var(--info-bg); color: var(--info-text); font-size: 12px; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; }
+    .pub-bar .x { cursor: pointer; font-weight: 600; }
+    .pub-doc { background: #fff; padding: 28px 32px; }
+    .pub-bc { font-size: 12px; color: var(--text-3); margin-bottom: 14px; }
+    .pub-doc h2 { font-size: 20px; font-weight: 600; margin: 0 0 4px; color: var(--text); }
+    .pub-meta { font-size: 12px; color: var(--text-3); margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--border-soft); }
+    .pub-sec { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-2); margin: 22px 0 10px; }
+    .pub-item { margin-bottom: 14px; }
+    .pub-item .pt { font-size: 15px; font-weight: 600; color: var(--text); }
+    .pub-item .pb { font-size: 14px; color: var(--text); margin-top: 3px; }
+    .pub-item .ps { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+    .pub-foot { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--border-soft); font-size: 12px; color: var(--text-3); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    // ─────────────────────────────────────────────────────────────
+    // CONFIG
+    //   LIVE_ENDPOINT : the Render proxy that hides the n8n webhook,
+    //     enforces CORS, rate-limits, and validates input. The browser
+    //     never sees the n8n URL — it only talks to this endpoint.
+    //   The page ALWAYS loads SAMPLE_DATA below on open — a real brief
+    //     from an actual run — so it is instant, costless, and works even
+    //     if the backend is asleep. The live pipeline only runs on demand
+    //     (when the visitor flips "Try it live" and clicks a button).
+    //   Free-tier note: the Render service sleeps after ~15 min idle, so
+    //     the first live run may take ~30-50s to wake it. The sample brief
+    //     masks this — nothing blocks on the backend until a live run.
+    // ─────────────────────────────────────────────────────────────
+    const LIVE_ENDPOINT = "https://loopline-brief-proxy.onrender.com/brief";
+
+    const SAMPLE_DATA = {"generated_at": "2026-06-27T06:42:45.639Z", "sprint": "Sprint 12", "brief": {"lead_item": {"title": "Relay→Anchor webhook schema still unresolved — blocking client notifications and 5 CS tickets", "body": "ANC-204 has been blocked since Nov 14 waiting on Relay's final webhook schema (REL-118). ANC-211 (unassigned, To Do) links the same root cause to 5 Intercom tickets about milestone notification emails not triggering. A schema freeze date was agreed in principle but not yet set. Needs a live decision today.", "citations": [2, 10, 20, 22, 23]}, "watch_list": [{"title": "Salesforce v2 timeline slip risks Dec 2 Marketing announcement", "body": "Mira Bell flagged on Nov 15 that Salesforce v2 needs 3 more sprints, not 2. The Dec 2 announcement remains tentative pending Relay's revised estimate. Relay's retro action to flag the timeline risk to Marketing is still open. Marketing needs a confirmed date or a clear no.", "citations": [4, 13, 15, 16]}, {"title": "Signal's Q4 churn dashboard (SIG-91) unassigned with a Nov 27 Finance deadline", "body": "Finance needs the board-prep churn dashboard by Nov 27. SIG-91 is unassigned and Signal is already at capacity with SIG-87 and the data pipeline migration. No plan is in place. Finance rep should confirm the hard deadline; Signal PO needs to make a call on prioritization today.", "citations": [5, 18, 21]}, {"title": "Client health score showing stale data — fix pushed to next sprint", "body": "SIG-87 (In Progress, yusuf.demir) traces 4 CS tickets to a caching layer not invalidating on milestone updates. A regression pass is required before deploy — earliest landing is next sprint. CS and Signal should align on a customer-facing status update in the meantime.", "citations": [7, 9]}, {"title": "Salesforce connector CRM version mismatch generating 9 client tickets this week", "body": "REL-130 (daniel.osei, In Progress) — clients on newer Salesforce API versions are hitting a deprecated field. Nine tickets this week, all same root cause. Fix is scoped and expected to ship by end of Sprint 12. CS should have a holding response ready.", "citations": [8]}], "fyi": [{"title": "Marketing: two confirmed sends this week, no eng action needed", "body": "The new onboarding checklist feature highlight email goes out Nov 21 (Anchor feature already shipped) and the Q4 customer success blog series launches Nov 25 (content-only). No engineering dependency for either.", "citations": [14, 17]}, {"title": "Three Anchor–Relay coordination retro actions still open entering Sprint 12", "body": "Open items: Anchor to share sprint planning docs one day earlier; Relay to flag schema changes in #cross-team immediately; both POs to finalize the shared staging environment proposal. All due Sprint 12 — worth a quick status check with both POs.", "citations": [3, 6, 19]}]}, "sources": [{"index": 1, "source": "confluence_retro", "chunk_type": "retro_theme", "ref_id": "Team Anchor — Sprint 11 Retro-theme-2", "team": "Anchor", "matched_queries": ["Cross-team blockers and dependencies at risk"], "content": "[Confluence | ENG] Team Anchor — Sprint 11 Retro\nRetro theme: \"Estimating cross-team dependent work is hard when we don't know Relay's sprint plan in advance\""}, {"index": 2, "source": "jira", "chunk_type": "jira_issue", "ref_id": "ANC-204", "team": "Team Anchor", "matched_queries": ["Cross-team blockers and dependencies at risk"], "content": "[ANC Jira] ANC-204 — Onboarding milestone trigger — webhook payload from Relay\nTeam: Team Anchor | Sprint: Sprint 12 | Type: Story | Status: Blocked\nAssignee: petra.novak\nLabels: cross-team, dependency:relay\nBlocked by: REL-118\nLatest comment (petra.novak, 2024-11-18T09:12:00Z): \"Still waiting on Relay to confirm final webhook schema. Client notification emails can't be tested until this lands. Blocked since Nov 14.\""}, {"index": 3, "source": "confluence_retro", "chunk_type": "retro_action", "ref_id": "Team Anchor — Sprint 11 Retro-action-0", "team": "Anchor", "matched_queries": ["Cross-team blockers and dependencies at risk", "Decisions made this week that affect multiple teams"], "content": "[Confluence | ENG] Team Anchor — Sprint 11 Retro\nAction item: \"Ask Relay to flag schema changes in the shared #cross-team channel as soon as they happen, not at sprint end\" — Owner: anchor-po, Due: Sprint 12, Status: open"}, {"index": 4, "source": "confluence_retro", "chunk_type": "retro_action", "ref_id": "Team Relay — Sprint 11 Retro-action-2", "team": "Relay", "matched_queries": ["Cross-team blockers and dependencies at risk", "Upcoming external commitments — launches, deadlines, announcements", "Unresolved retro action items from last sprint"], "content": "[Confluence | ENG] Team Relay — Sprint 11 Retro\nAction item: \"Flag Salesforce v2 timeline risk to Marketing ahead of their Dec 2 launch planning\" — Owner: mira.bell, Due: Sprint 12, week 1, Status: open"}, {"index": 5, "source": "jira", "chunk_type": "jira_issue", "ref_id": "SIG-91", "team": "Team Signal", "matched_queries": ["Cross-team blockers and dependencies at risk"], "content": "[SIG Jira] SIG-91 — Q4 churn dashboard — refresh for board prep\nTeam: Team Signal | Sprint: Sprint 12 | Type: Task | Status: To Do\nAssignee: unassigned\nLabels: cross-team, finance-dependency\nLatest comment (yusuf.demir, 2024-11-18T16:10:00Z): \"Finance needs this by Nov 27 for the board deck. We're already at capacity this sprint with SIG-87 and the data pipeline migration. Need to flag the timing conflict.\""}, {"index": 6, "source": "confluence_retro", "chunk_type": "retro_action", "ref_id": "Team Relay — Sprint 11 Retro-action-0", "team": "Relay", "matched_queries": ["Cross-team blockers and dependencies at risk", "Unresolved retro action items from last sprint"], "content": "[Confluence | ENG] Team Relay — Sprint 11 Retro\nAction item: \"Set up a shared staging environment proposal with Anchor\" — Owner: relay-po, Due: Sprint 12, Status: open"}, {"index": 7, "source": "jira", "chunk_type": "jira_issue", "ref_id": "SIG-87", "team": "Team Signal", "matched_queries": ["Client-impacting bugs or issues this week"], "content": "[SIG Jira] SIG-87 — Fix stale data in client health score dashboard\nTeam: Team Signal | Sprint: Sprint 12 | Type: Bug | Status: In Progress\nAssignee: yusuf.demir\nLabels: from:intercom\nLatest comment (yusuf.demir, 2024-11-18T09:45:00Z): \"Root cause is a caching layer not invalidating on milestone updates. Fix is straightforward but needs a full regression pass before deploy — won't land until next sprint at the earliest.\""}, {"index": 8, "source": "jira", "chunk_type": "jira_issue", "ref_id": "REL-130", "team": "Team Relay", "matched_queries": ["Client-impacting bugs or issues this week"], "content": "[REL Jira] REL-130 — Salesforce connector — handle CRM version mismatch errors\nTeam: Team Relay | Sprint: Sprint 12 | Type: Bug | Status: In Progress\nAssignee: daniel.osei\nLabels: from:intercom, client-facing\nLatest comment (daniel.osei, 2024-11-18T13:05:00Z): \"9 client tickets this week, all tied to the same root cause — clients on newer Salesforce API versions are hitting a deprecated field. Fix is scoped, should ship by end of sprint.\""}, {"index": 9, "source": "intercom", "chunk_type": "cs_theme", "ref_id": "cs-theme-2", "team": "Signal", "matched_queries": ["Client-impacting bugs or issues this week"], "content": "[Intercom CS, 2024-11-11 to 2024-11-17] Theme: \"Health score dashboard showing outdated numbers\" — 4 tickets, severity: medium. Clients noticed their dashboard health score hadn't updated in several days despite activity on their account."}, {"index": 10, "source": "jira", "chunk_type": "jira_issue", "ref_id": "ANC-211", "team": "Team Anchor", "matched_queries": ["Client-impacting bugs or issues this week"], "content": "[ANC Jira] ANC-211 — Fix: milestone notification email not triggering (client-reported)\nTeam: Team Anchor | Sprint: Sprint 12 | Type: Bug | Status: To Do\nAssignee: unassigned\nLabels: cross-team, from:intercom\nLatest comment (petra.novak, 2024-11-17T15:40:00Z): \"Linked to 5 Intercom tickets this week. Likely same root cause as ANC-204 blocker — notification logic depends on the webhook payload too.\""}, {"index": 11, "source": "confluence_retro", "chunk_type": "retro_theme", "ref_id": "Team Relay — Sprint 11 Retro-theme-0", "team": "Relay", "matched_queries": ["Client-impacting bugs or issues this week", "Decisions made this week that affect multiple teams"], "content": "[Confluence | ENG] Team Relay — Sprint 11 Retro\nRetro theme: \"Webhook spec changed mid-sprint without notifying Anchor — we know this caused friction\""}, {"index": 12, "source": "confluence_retro", "chunk_type": "retro_theme", "ref_id": "Team Anchor — Sprint 11 Retro-theme-0", "team": "Anchor", "matched_queries": ["Client-impacting bugs or issues this week"], "content": "[Confluence | ENG] Team Anchor — Sprint 11 Retro\nRetro theme: \"We keep finding out about Relay's schema changes after we've already built against the old version\""}, {"index": 13, "source": "marketing", "chunk_type": "campaign", "ref_id": "campaign-0", "team": "Relay", "matched_queries": ["Upcoming external commitments — launches, deadlines, announcements"], "content": "[Marketing calendar] \"Salesforce Integration v2 launch announcement\" planned for 2024-12-02. Status: tentative — pending eng confirmation. Holding off on public date until Relay confirms revised timeline, per Nov 14 decision log entry."}, {"index": 14, "source": "marketing", "chunk_type": "campaign", "ref_id": "campaign-1", "team": null, "matched_queries": ["Upcoming external commitments — launches, deadlines, announcements"], "content": "[Marketing calendar] \"Q4 customer success stories blog series\" planned for 2024-11-25. Status: confirmed. No engineering dependency, content-only."}, {"index": 15, "source": "confluence_decision", "chunk_type": "decision", "ref_id": "Cross-Team Decision Log — Week 47-decision-1", "team": null, "matched_queries": ["Upcoming external commitments — launches, deadlines, announcements", "Decisions made this week that affect multiple teams"], "content": "[Confluence | ENG] Cross-Team Decision Log — Week 47\nDecision (2024-11-14): \"Marketing's Salesforce v2 announcement will stay tentative (no public date) until Relay confirms a revised completion estimate\" — Made by: mira.bell, marketing-lead"}, {"index": 16, "source": "slack", "chunk_type": "slack_message", "ref_id": "slack-2", "team": "Relay", "matched_queries": ["Upcoming external commitments — launches, deadlines, announcements"], "content": "[Slack #cross-team] mira.bell (Relay), 2024-11-15T09:20:00Z: \"@marketing-lead following up — realistically the Salesforce v2 work is going to take 3 more sprints not 2. wanted to flag before the Dec 2 date gets locked into anything external-facing\" [flagged by PM]"}, {"index": 17, "source": "marketing", "chunk_type": "campaign", "ref_id": "campaign-2", "team": "Anchor", "matched_queries": ["Upcoming external commitments — launches, deadlines, announcements"], "content": "[Marketing calendar] \"New onboarding checklist UI — feature highlight email\" planned for 2024-11-21. Status: confirmed. Based on positive CS feedback this week. Low risk, feature already shipped."}, {"index": 18, "source": "confluence_retro", "chunk_type": "retro_action", "ref_id": "Team Signal — Sprint 11 Retro-action-0", "team": "Signal", "matched_queries": ["Unresolved retro action items from last sprint"], "content": "[Confluence | ENG] Team Signal — Sprint 11 Retro\nAction item: \"Propose a standing monthly check-in with Finance ahead of board prep weeks\" — Owner: signal-po, Due: Sprint 13, Status: open"}, {"index": 19, "source": "confluence_retro", "chunk_type": "retro_action", "ref_id": "Team Anchor — Sprint 11 Retro-action-1", "team": "Anchor", "matched_queries": ["Unresolved retro action items from last sprint"], "content": "[Confluence | ENG] Team Anchor — Sprint 11 Retro\nAction item: \"Try sharing sprint planning docs with Relay one day earlier next sprint\" — Owner: anchor-po, Due: Sprint 12, Status: open"}, {"index": 20, "source": "confluence_retro", "chunk_type": "retro_action", "ref_id": "Team Relay — Sprint 11 Retro-action-1", "team": "Relay", "matched_queries": ["Unresolved retro action items from last sprint", "Decisions made this week that affect multiple teams"], "content": "[Confluence | ENG] Team Relay — Sprint 11 Retro\nAction item: \"Agree on a webhook schema freeze date with Anchor before making further changes\" — Owner: relay-po + anchor-po, Due: Sprint 12, week 1, Status: open"}, {"index": 21, "source": "confluence_retro", "chunk_type": "retro_theme", "ref_id": "Team Signal — Sprint 11 Retro-theme-2", "team": "Signal", "matched_queries": ["Unresolved retro action items from last sprint"], "content": "[Confluence | ENG] Team Signal — Sprint 11 Retro\nRetro theme: \"We should have a clearer SLA with Finance for board-prep requests so they don't land as surprises mid-sprint\""}, {"index": 22, "source": "confluence_decision", "chunk_type": "decision", "ref_id": "Cross-Team Decision Log — Week 47-decision-0", "team": null, "matched_queries": ["Decisions made this week that affect multiple teams"], "content": "[Confluence | ENG] Cross-Team Decision Log — Week 47\nDecision (2024-11-13): \"Anchor and Relay agreed to do webhook schema changes in a shared doc going forward, reviewed by both POs before implementation\" — Made by: anchor-po, relay-po"}, {"index": 23, "source": "slack", "chunk_type": "slack_message", "ref_id": "slack-1", "team": "Anchor", "matched_queries": ["Decisions made this week that affect multiple teams"], "content": "[Slack #cross-team] petra.novak (Anchor), 2024-11-14T11:40:00Z: \"ah okay, this is the second time the schema's shifted on us mid-sprint. can we agree on a freeze date going forward? happy to sync today\""}]};
+
+    const SPRINTS = [
+      { value: "Sprint 12", label: "Sprint 12 · Week 47", available: true },
+      { value: "Sprint 11", label: "Sprint 11 · Week 46", available: false },
+      { value: "Sprint 10", label: "Sprint 10 · Week 45", available: false },
+    ];
+
+    function App() {
+      const [liveMode, setLiveMode] = useState(false);
+      const [sprint, setSprint] = useState("Sprint 12");
+      const [observation, setObservation] = useState('');
+      const [status, setStatus] = useState('idle');      // start empty; brief appears on Generate
+      const [errorMsg, setErrorMsg] = useState('');
+      const [brief, setBrief] = useState(null);
+      const [sources, setSources] = useState([]);
+      const [generatedAt, setGeneratedAt] = useState(null);
+      const [isSample, setIsSample] = useState(false);
+      const [expandedSource, setExpandedSource] = useState(null);
+      const [editingKey, setEditingKey] = useState(null);
+      const [approved, setApproved] = useState(false);
+      const [edited, setEdited] = useState(false);
+      const [pendingAction, setPendingAction] = useState(null);
+      const [loadingStage, setLoadingStage] = useState(0);
+      const [versions, setVersions] = useState([]);   // session-scoped history
+      const [activeVersion, setActiveVersion] = useState(null); // id being viewed
+      const [versionSeq, setVersionSeq] = useState(0);
+      const [expandedVer, setExpandedVer] = useState(null);
+
+      // Replays the embedded real brief with a short simulated "working" beat,
+      // so the sample run feels like the live pipeline (it genuinely produced
+      // this brief — we're just replaying it without the cost or a live call).
+      const STAGES = [
+        'Running five standing queries…',
+        'Retrieving across Jira, Confluence, Intercom, Marketing, Slack…',
+        'De-duplicating and ranking what was found…',
+        'Synthesizing the brief…'
+      ];
+      function runSample() {
+        setErrorMsg(''); setPendingAction(null); setStatus('loading'); setLoadingStage(0);
+        let i = 0;
+        const tick = setInterval(() => {
+          i += 1;
+          if (i < STAGES.length) { setLoadingStage(i); }
+          else {
+            clearInterval(tick);
+            setBrief(SAMPLE_DATA.brief);
+            setSources(SAMPLE_DATA.sources || []);
+            setGeneratedAt(SAMPLE_DATA.generated_at);
+            setApproved(false); setEdited(false); setIsSample(true); setStatus('ready');
+            pushVersion({ trigger: 'draft', briefSnapshot: SAMPLE_DATA.brief, sources: SAMPLE_DATA.sources || [], generatedAt: SAMPLE_DATA.generated_at });
+          }
+        }, 420);
+      }
+
+      // Dispatcher for the Generate button: sample replay when live is off,
+      // real pipeline when live is on.
+      function generate() {
+        if (liveMode) callWebhook(false);
+        else runSample();
+      }
+
+      async function callWebhook(withObservation) {
+        if (!liveMode) { runSample(); return; }
+        if (!LIVE_ENDPOINT) { setErrorMsg('No live endpoint is configured.'); return; }
+        setStatus('loading'); setErrorMsg(''); setPendingAction(null);
+        try {
+          const body = { sprint, requested_at: new Date().toISOString() };
+          if (withObservation && observation.trim()) body.observation = observation.trim();
+          const res = await fetch(LIVE_ENDPOINT, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+          });
+          if (!res.ok) throw new Error('Webhook returned ' + res.status);
+          const data = await res.json();
+          setBrief(data.brief); setSources(data.sources || []);
+          const ga = data.generated_at || new Date().toISOString();
+          setGeneratedAt(ga);
+          setApproved(false); setEdited(false); setIsSample(false); setStatus('ready');
+          pushVersion({
+            trigger: withObservation ? 'observation' : 'refresh',
+            observation: withObservation ? observation.trim() : '',
+            briefSnapshot: data.brief, sources: data.sources || [], generatedAt: ga
+          });
+        } catch (err) {
+          setErrorMsg((err.message || 'Failed to reach webhook.') + ' — live runs need the backend awake and CORS allowed. The sample brief below is still fully interactive.');
+          setStatus('ready');
+        }
+      }
+
+      const LIVE_REQUIRED = 'This runs the live pipeline — switch on "Try it live" above to steer or refresh the brief. The sample you are viewing is a real, frozen run.';
+      function requestRefresh() {
+        if (!liveMode) { setErrorMsg(LIVE_REQUIRED); return; }
+        if (edited) setPendingAction('refresh'); else callWebhook(false);
+      }
+      function requestRegenerate() {
+        if (!liveMode) { setErrorMsg(LIVE_REQUIRED); return; }
+        if (!observation.trim()) { setErrorMsg('Add a note in the observation box first, or use Refresh to pull fresh data.'); return; }
+        if (edited) setPendingAction('regenerate'); else callWebhook(true);
+      }
+      function confirmPending() {
+        if (pendingAction === 'refresh') callWebhook(false);
+        else if (pendingAction === 'regenerate') callWebhook(true);
+      }
+
+      function updateField(section, index, field, value) {
+        setEdited(true);
+        setBrief(prev => {
+          const next = { ...prev };
+          if (section === 'lead_item') next.lead_item = { ...next.lead_item, [field]: value };
+          else { const list = [...next[section]]; list[index] = { ...list[index], [field]: value }; next[section] = list; }
+          return next;
+        });
+      }
+
+      // Append a version to the session history. The shape here is exactly
+      // what a later n8n 'Google Sheets append' node would write as one row:
+      // { id, n, created_at, sprint, trigger, observation, approved, brief }.
+      function pushVersion({ trigger, observation, briefSnapshot, sources: srcSnap, generatedAt: ga, approved: appr }) {
+        setVersionSeq(seq => {
+          const n = seq + 1;
+          const entry = {
+            id: 'v' + n, n,
+            created_at: new Date().toISOString(),
+            sprint,
+            trigger,                         // 'draft' | 'observation' | 'refresh' | 'manual-edit'
+            observation: observation || '',
+            approved: !!appr,
+            brief: briefSnapshot,
+            sources: srcSnap,
+            generatedAt: ga,
+          };
+          setVersions(v => [...v, entry]);
+          setActiveVersion(entry.id);
+          return n;
+        });
+      }
+
+      // Load a past version back into the editor view (read-the-history).
+      function viewVersion(entry) {
+        setBrief(entry.brief);
+        setSources(entry.sources || []);
+        setGeneratedAt(entry.generatedAt);
+        setApproved(entry.approved);
+        setEdited(false);
+        setActiveVersion(entry.id);
+      }
+
+      function Editable({ section, index, field, value, multiline }) {
+        const key = section + '-' + index + '-' + field;
+        if (editingKey === key) {
+          const Tag = multiline ? 'textarea' : 'input';
+          return <Tag autoFocus className={multiline ? '' : 'inline-edit'} value={value}
+            onChange={e => updateField(section, index, field, e.target.value)}
+            onBlur={() => setEditingKey(null)} style={multiline ? { minHeight: 70 } : {}} />;
+        }
+        return <div className={'editable ' + (field === 'title' ? 'card-title' : 'card-body')}
+          onClick={() => setEditingKey(key)} title="Click to edit">{value || '—'}</div>;
+      }
+
+      const SOURCE_LABELS = { jira: 'Jira', confluence_retro: 'Confluence', confluence_decision: 'Confluence', intercom: 'Intercom', marketing: 'Marketing', slack: 'Slack' };
+      function shortRef(src) {
+        if (!src.ref_id) return null;
+        if (/^[A-Z]{2,5}-\d+$/.test(src.ref_id)) return src.ref_id;
+        if (src.chunk_type === 'retro_theme') return (src.team || '') + ' retro';
+        if (src.chunk_type === 'retro_action') return (src.team || '') + ' action';
+        if (src.chunk_type === 'decision') return 'decision';
+        if (src.chunk_type === 'cs_theme') return 'CS theme';
+        if (src.chunk_type === 'campaign') return 'campaign';
+        if (src.chunk_type === 'slack_message') return '#cross-team';
+        return null;
+      }
+      function Pills({ citations }) {
+        if (!citations || !citations.length) return null;
+        return <div className="pills">{citations.map(num => {
+          const src = sources.find(s => s.index === num);
+          if (!src) return null;
+          const open = expandedSource === String(num);
+          const label = SOURCE_LABELS[src.source] || src.source;
+          const ref = shortRef(src);
+          return <button key={num} className={'pill pill-' + src.source + (open ? ' open' : '')}
+            onClick={() => setExpandedSource(open ? null : String(num))}>{label}{ref ? ' · ' + ref : ''}</button>;
+        })}</div>;
+      }
+      function SourcePanel({ citations }) {
+        const openNum = (citations || []).find(c => String(c) === expandedSource);
+        if (!openNum) return null;
+        const src = sources.find(s => String(s.index) === expandedSource);
+        if (!src) return null;
+        return <div className="source-panel">
+          <div className="source-meta">
+            <span className="strong">{src.source}</span><span>·</span><span>{src.chunk_type}</span>
+            {src.team && <><span>·</span><span>{src.team}</span></>}
+            {src.ref_id && <><span>·</span><span>{src.ref_id}</span></>}
+          </div>
+          <div className="source-content">{src.content}</div>
+        </div>;
+      }
+      function Card({ section, index, item }) {
+        return <div className="card">
+          <Editable section={section} index={index} field="title" value={item.title} />
+          <Editable section={section} index={index} field="body" value={item.body} multiline />
+          <Pills citations={item.citations} />
+          <SourcePanel citations={item.citations || []} />
+        </div>;
+      }
+
+      const activeSprintLabel = (SPRINTS.find(s => s.value === sprint) || {}).label || sprint;
+
+      // Renders the approved, edited brief as a saved Confluence-style page —
+      // a preview of the artifact the team would receive. In production this
+      // page would be published automatically on approval.
+      function refLabel(num) {
+        const src = sources.find(s => s.index === num);
+        if (!src) return null;
+        const label = SOURCE_LABELS[src.source] || src.source;
+        const ref = shortRef(src);
+        return label + (ref ? ' · ' + ref : '');
+      }
+      function srcLine(cites) {
+        const labels = (cites || []).map(refLabel).filter(Boolean);
+        return labels.length ? 'Sources: ' + labels.join('  ·  ') : null;
+      }
+      function PublishedDoc() {
+        const when = generatedAt ? new Date(generatedAt) : new Date();
+        const dateStr = when.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+        return <div className="pub">
+          <div className="pub-bar">
+            <span>Preview · this is the page the team would receive. In production it publishes to Confluence automatically on approval.</span>
+            <span className="x" onClick={() => setApproved(false)} title="Close preview">✕</span>
+          </div>
+          <div className="pub-doc">
+            <div className="pub-bc">ENG · Cross-team · The Loop</div>
+            <h2>The Loop — {activeSprintLabel} brief</h2>
+            <div className="pub-meta">Published {dateStr} · approved by facilitator</div>
+
+            <div className="pub-sec">Lead item</div>
+            {brief.lead_item && <div className="pub-item">
+              <div className="pt">{brief.lead_item.title}</div>
+              <div className="pb">{brief.lead_item.body}</div>
+              {srcLine(brief.lead_item.citations) && <div className="ps">{srcLine(brief.lead_item.citations)}</div>}
+            </div>}
+
+            {(brief.watch_list || []).length > 0 && <div className="pub-sec">Watch list</div>}
+            {(brief.watch_list || []).map((it, i) => <div className="pub-item" key={i}>
+              <div className="pt">{it.title}</div>
+              <div className="pb">{it.body}</div>
+              {srcLine(it.citations) && <div className="ps">{srcLine(it.citations)}</div>}
+            </div>)}
+
+            {(brief.fyi || []).length > 0 && <div className="pub-sec">FYI</div>}
+            {(brief.fyi || []).map((it, i) => <div className="pub-item" key={i}>
+              <div className="pt">{it.title}</div>
+              <div className="pb">{it.body}</div>
+              {srcLine(it.citations) && <div className="ps">{srcLine(it.citations)}</div>}
+            </div>)}
+
+            <div className="pub-foot">Drafted by the Loop assistant from this week's Jira, Confluence, Intercom, Marketing, and Slack activity. Reviewed and approved by the facilitator before publishing.</div>
+          </div>
+        </div>;
+      }
+
+      return <div className="wrap">
+        <div className="title-row">
+          <h1>The Loop — Facilitator Review</h1>
+          <p className="subtitle">Cross-team alignment brief · the assistant drafts, the facilitator decides</p>
+        </div>
+
+        <div className="demo-note">
+          This is a working demo. Click "Generate brief" to produce this week's cross-team brief from a real run of the pipeline. Once it appears, click any title or body to edit it, and click a source pill to see exactly where each point came from. To run the live pipeline against the n8n backend, switch on "Try it live."
+        </div>
+
+        <div className="layout">
+        <aside className="rail">
+          <p className="rail-title">Versions</p>
+          {versions.length === 0 && <p className="rail-empty">No versions yet. Generate a brief to start the history.</p>}
+          {versions.map(v => (
+            <div key={v.id} className={'ver' + (activeVersion === v.id ? ' active' : '')} onClick={() => { viewVersion(v); setExpandedVer(expandedVer === v.id ? null : v.id); }}>
+              <div className="vh">
+                <span className="vn">{new Date(v.created_at).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</span>
+              </div>
+              <div className={'vr' + (expandedVer === v.id ? ' open' : '')}>{
+                v.trigger === 'draft' ? 'Initial AI draft' :
+                v.trigger === 'observation' ? 'Steered: "' + v.observation + '"' :
+                v.trigger === 'refresh' ? 'Refreshed from latest data' :
+                v.trigger === 'manual-edit' ? 'Facilitator edits' : 'Approved'
+              }</div>
+              {v.approved && <span className="vtag approved">approved &amp; saved</span>}
+            </div>
+          ))}
+          {versions.length > 0 && <p className="rail-note">Session history. In production each version appends to a Google Sheet — an auditable, human-readable log.</p>}
+        </aside>
+        <div className="main">
+        <div className="controls">
+          <div className="live-toggle" onClick={() => { setLiveMode(!liveMode); setErrorMsg(''); }}>
+            <span className={'switch' + (liveMode ? ' on' : '')}><span className="knob"></span></span>
+            Try it live
+            <span className="tip"><span className="q">?</span>
+              <span className="bubble">Off: explore the sample brief (instant, no cost). On: the buttons call the real n8n + retrieval + Claude pipeline. A live run may take a few seconds.</span>
+            </span>
+          </div>
+
+          <div className="control-row">
+            <div className="field grow">
+              <label>Data window</label>
+              <select value={sprint} onChange={e => setSprint(e.target.value)} disabled={!liveMode}>
+                {SPRINTS.map(s => (
+                  <option key={s.value} value={s.value} disabled={!s.available}>
+                    {s.label}{s.available ? '' : ' (no data yet)'}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button onClick={generate} disabled={status === 'loading'}>
+              {status === 'loading' ? 'Generating…' : (liveMode ? 'Generate live brief' : 'Generate brief')}
+            </button>
+          </div>
+        </div>
+
+        {errorMsg && <div className="msg error">{errorMsg}</div>}
+
+        {pendingAction && <div className="msg warn">
+          <span>{pendingAction === 'refresh'
+            ? 'Refreshing pulls the latest data and will replace the edits you have made. Continue?'
+            : 'Regenerating with your note produces a fresh brief and will replace your edits. Continue?'}</span>
+          <span className="warn-actions">
+            <button onClick={confirmPending}>Continue</button>
+            <button className="secondary" onClick={() => setPendingAction(null)}>Cancel</button>
+          </span>
+        </div>}
+
+        {status === 'idle' && <div className="empty">Pick your data window, then generate this week's Loop brief.</div>}
+        {status === 'loading' && <div className="empty">{STAGES[loadingStage]}</div>}
+
+        {brief && status !== 'loading' && <div>
+          <div className="brief-head">
+            <div>
+              <p className="t">The Loop — pre-meeting brief</p>
+              <p className="d">{activeSprintLabel}{generatedAt ? ' · generated ' + new Date(generatedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : ''}{isSample ? ' · sample run' : ''}</p>
+            </div>
+            <span className={'badge' + (approved ? ' approved' : (edited ? ' edited' : ''))}>
+              {approved ? 'Approved' : (edited ? 'Edited — pending review' : 'Draft — pending review')}
+            </span>
+          </div>
+
+          <div className="section-head"><span className="dot lead"></span><span className="section-label">Lead item</span></div>
+          {brief.lead_item && <Card section="lead_item" index={0} item={brief.lead_item} />}
+
+          {(brief.watch_list || []).length > 0 && <div className="section-head"><span className="dot watch"></span><span className="section-label">Watch list</span></div>}
+          {(brief.watch_list || []).map((item, i) => <Card key={i} section="watch_list" index={i} item={item} />)}
+
+          {(brief.fyi || []).length > 0 && <div className="section-head"><span className="dot fyi"></span><span className="section-label">FYI</span></div>}
+          {(brief.fyi || []).map((item, i) => <Card key={i} section="fyi" index={i} item={item} />)}
+
+          <div className="obs-row">
+            <div className="field grow">
+              <label>Observation for the agent
+                <span className="tip"><span className="q">?</span>
+                  <span className="bubble">Optional. Add a steer — e.g. "the webhook issue is being handled offline, downgrade it" — then Regenerate. The agent weighs your note when prioritizing, but won't invent anything not in the data. (Live mode only.)</span>
+                </span>
+              </label>
+              <textarea placeholder={liveMode ? "Optional note to steer the next regeneration…" : "Steering runs the live pipeline — switch on \"Try it live\" to use this"} value={observation}
+                onChange={e => setObservation(e.target.value)} style={{ minHeight: 38 }} disabled={!liveMode} />
+            </div>
+          </div>
+
+          <div className="actions">
+            <button onClick={() => { setApproved(true); pushVersion({ trigger: edited ? 'manual-edit' : 'approved', briefSnapshot: brief, sources: sources, generatedAt: generatedAt, approved: true }); }}>✓ Approve &amp; save</button>
+            <button className="secondary" onClick={requestRegenerate} disabled={status === 'loading'}>↻ Regenerate with note</button>
+            <button className="secondary" onClick={requestRefresh} disabled={status === 'loading'}>⟳ Refresh data
+              <span className="tip" style={{ marginLeft: 5 }}><span className="q">?</span>
+                <span className="bubble">Only use this if new data has been added since this brief was generated. It pulls the latest and replaces any edits you've made. (Live mode only.)</span>
+              </span>
+            </button>
+          </div>
+          <p className="hint">Click any title or body to edit. Click a citation pill to view its source chunk.</p>
+
+          {approved && <PublishedDoc />}
+        </div>}
+        </div>
+        </div>
+      </div>;
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
