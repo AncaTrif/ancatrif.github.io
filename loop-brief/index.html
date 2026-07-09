@@ -170,6 +170,7 @@
       const [sending, setSending] = useState(false);
       const [sendError, setSendError] = useState('');
       const [sent, setSent] = useState(false);
+      const [showPreview, setShowPreview] = useState(false);
 
       // Replays the embedded real brief with a short simulated "working" beat,
       // so the sample run feels like the live pipeline (it genuinely produced
@@ -231,20 +232,15 @@
         }
       }
 
-      const LIVE_REQUIRED = 'This runs the live pipeline — switch on "Try it live" above to steer or refresh the brief. The sample you are viewing is a real, frozen run.';
-      function requestRefresh() {
-        if (!liveMode) { setErrorMsg(LIVE_REQUIRED); return; }
-        if (edited) setPendingAction('refresh'); else callWebhook(false);
-      }
-      function requestRegenerate() {
-        if (!liveMode) { setErrorMsg(LIVE_REQUIRED); return; }
-        if (!observation.trim()) { setErrorMsg('Add a note in the observation box first, or use Refresh to pull fresh data.'); return; }
-        if (edited) setPendingAction('regenerate'); else callWebhook(true);
-      }
-      function confirmPending() {
-        if (pendingAction === 'refresh') callWebhook(false);
-        else if (pendingAction === 'regenerate') callWebhook(true);
-      }
+          const LIVE_REQUIRED = 'This runs the live pipeline — switch on "Try it live" above to steer or regenerate the brief. The sample you are viewing is a real, frozen run.';
+          function requestRegenerate() {
+          if (!liveMode) { setErrorMsg(LIVE_REQUIRED); return; }
+          const hasNote = observation.trim().length > 0;
+          if (edited) setPendingAction('regenerate'); else callWebhook(hasNote);
+        }
+        function confirmPending() {
+          if (pendingAction === 'regenerate') callWebhook(observation.trim().length > 0);
+        }
       async function approveAndSend() {
         setApproved(true);
         setSendError('');
@@ -436,7 +432,7 @@
         </div>
 
         <div className="demo-note">
-          This is a working demo. Click "Generate brief" to produce this week's cross-team brief from a real run of the pipeline. Once it appears, click any title or body to edit it, and click a source pill to see exactly where each point came from. To run the live pipeline against the n8n backend, switch on "Try it live."
+          This is a working demo. Click "Generate brief" to produce this week's cross-team brief from a real run of the pipeline. Once it appears, click any title or body to edit it, click a source pill to see exactly where each point came from, and click Preview to see the published version. "Approve & send" saves this version and — in live mode — sends the brief by email and publishes it to Confluence in production. To run the live pipeline against the n8n backend, switch on "Try it live."
         </div>
 
         <div className="layout">
@@ -489,9 +485,7 @@
         {errorMsg && <div className="msg error">{errorMsg}</div>}
 
         {pendingAction && <div className="msg warn">
-          <span>{pendingAction === 'refresh'
-            ? 'Refreshing pulls the latest data and will replace the edits you have made. Continue?'
-            : 'Regenerating with your note produces a fresh brief and will replace your edits. Continue?'}</span>
+        <span>Regenerating produces a fresh brief and will replace the edits you have made. Continue?</span>
           <span className="warn-actions">
             <button onClick={confirmPending}>Continue</button>
             <button className="secondary" onClick={() => setPendingAction(null)}>Cancel</button>
@@ -536,20 +530,22 @@
             </div>
           </div>
 
-          <div className="actions">
+         <div className="actions">
             <button onClick={approveAndSend} disabled={sending}>
-              {sending ? 'Sending…' : '✓ Approve & save'}
+            {sending ? 'Sending…' : '✓ Approve & send'}
             </button>
-            <button className="secondary" onClick={requestRegenerate} disabled={status === 'loading'}>↻ Regenerate with note</button>
-            <button className="secondary" onClick={requestRefresh} disabled={status === 'loading'}>⟳ Refresh data
-              <span className="tip" style={{ marginLeft: 5 }}><span className="q">?</span>
-                <span className="bubble">Only use this if new data has been added since this brief was generated. It pulls the latest and replaces any edits you've made. (Live mode only.)</span>
-              </span>
+            <button className="secondary" onClick={() => setShowPreview(!showPreview)}>
+            {showPreview ? '✕ Hide preview' : '👁 Preview'}
+            </button>
+            <button className="secondary" onClick={requestRegenerate} disabled={status === 'loading'}>↻ Regenerate
+            <span className="tip" style={{ marginLeft: 5 }}><span className="q">?</span>
+            <span className="bubble">Add a note above to steer it, or leave it blank to just pull the latest data. Replaces any edits you've made. (Live mode only.)</span>
+            </span>
             </button>
           </div>
           <p className="hint">Click any title or body to edit. Click a citation pill to view its source chunk.</p>
 
-          {approved && <PublishedDoc />}
+          {showPreview && <PublishedDoc />}
         </div>}
         </div>
         </div>
