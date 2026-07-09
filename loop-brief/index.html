@@ -217,7 +217,12 @@
           });
           if (!res.ok) throw new Error('Webhook returned ' + res.status);
           const data = await res.json();
-          setBrief(data.brief); setSources(data.sources || []);
+          if (data.error) {
+          setErrorMsg(data.error_message || 'The brief could not be generated. Try again.');
+          setStatus('ready');
+          return;
+          }
+setBrief(data.brief); setSources(data.sources || []);
           const ga = data.generated_at || new Date().toISOString();
           setGeneratedAt(ga);
           setApproved(false); setEdited(false); setIsSample(false); setStatus('ready');
