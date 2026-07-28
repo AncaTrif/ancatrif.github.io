@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales Lead Qualifier · Anca Trif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2C2280;
+    --accent:#E9E70C;
+    --paper:#FAFAF2;
+    --hover:#382E8F;
+    --mid:#443A9C;
+    --white:#FFFFFF;
+    --muted:#6E6A8C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Archivo',sans-serif;background:var(--paper);color:var(--ink);}
+  a{color:var(--ink);}
+
+  nav.top{max-width:1240px;margin:0 auto;padding:32px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .logo{font-weight:900;font-size:20px;letter-spacing:-0.02em;text-decoration:none;}
+
+  .navlinks{
+    display:flex;align-items:center;gap:40px;
+    font-family:'JetBrains Mono',monospace;font-weight:500;font-size:13px;
+    text-transform:uppercase;letter-spacing:0.1em;
+  }
+  .navlinks a{color:var(--ink);text-decoration:none;}
+  .navlinks a:hover{color:var(--hover);}
+  .drop{position:relative;}
+  .drop > .dt{
+    color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:4px;
+    background:none;border:none;font:inherit;letter-spacing:inherit;text-transform:inherit;padding:0;
+  }
+  .drop > .dt .car{font-size:9px;}
+  .dmenu{
+    position:absolute;top:100%;left:0;padding-top:12px;min-width:260px;display:none;z-index:20;
+  }
+  .drop:hover .dmenu, .drop:focus-within .dmenu{display:block;}
+  .dmenu-in{background:var(--ink);border:3px solid var(--ink);display:flex;flex-direction:column;}
+  .dmenu-in a{
+    color:var(--accent);text-decoration:none;padding:14px 18px;
+    border-bottom:1px solid var(--mid);
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;
+    text-transform:uppercase;letter-spacing:0.12em;
+  }
+  .dmenu-in a:last-child{border-bottom:none;}
+  .dmenu-in a:hover{background:var(--hover);color:var(--accent);}
+
+  .burger{background:none;border:none;padding:8px;cursor:pointer;display:none;flex-direction:column;gap:5px;}
+  .burger span{width:26px;height:3px;background:var(--ink);display:block;}
+
+  .mobmenu{display:none;border-top:3px solid var(--ink);background:var(--ink);flex-direction:column;padding:8px 32px 24px;}
+  .mobmenu.open{display:flex;}
+  .mobmenu a{
+    color:var(--accent);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--mid);
+    font-family:'JetBrains Mono',monospace;font-weight:500;font-size:13px;
+    text-transform:uppercase;letter-spacing:0.1em;
+  }
+  .mobmenu a.sub{padding:14px 0 14px 16px;}
+  .mobmenu .grp{
+    padding:16px 0 4px;color:#9B93D6;font-family:'JetBrains Mono',monospace;font-weight:600;
+    font-size:12px;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--mid);
+  }
+
+  .wrap{max-width:900px;margin:0 auto;padding:0 32px 80px;}
+
+  .back{
+    font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;
+    text-decoration:none;color:var(--mid);display:inline-block;margin-bottom:8px;
+  }
+  .back:hover{color:var(--ink);}
+
+  .hero{padding:24px 0 40px;border-bottom:3px solid var(--ink);}
+  .hero h1{font-weight:900;font-size:clamp(28px,4.4vw,44px);line-height:1.12;letter-spacing:-0.02em;margin-bottom:22px;}
+  .tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;}
+  .tag{
+    font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+    text-transform:uppercase;letter-spacing:0.04em;background:var(--accent);
+    padding:8px 18px;border-radius:999px;
+  }
+  .lede{font-size:18px;line-height:1.65;max-width:66ch;margin-bottom:28px;}
+  .cta{
+    display:inline-block;font-weight:700;font-size:16px;text-decoration:none;
+    background:var(--ink);color:var(--paper);padding:15px 32px;border:3px solid var(--ink);border-radius:999px;
+  }
+  .cta:hover{background:var(--hover);color:var(--paper);}
+
+  .notice{border:3px solid var(--ink);background:var(--white);padding:22px 26px;margin:32px 0 0;font-size:16px;line-height:1.6;}
+  .notice strong{font-weight:700;}
+
+  .sections{padding:32px 0 0;display:flex;flex-direction:column;gap:20px;}
+  .sec{border:3px solid var(--ink);}
+  .sec-head{
+    padding:22px 28px;background:var(--accent);display:flex;align-items:center;
+    justify-content:space-between;gap:20px;cursor:pointer;
+  }
+  .sec-head h2{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;
+    letter-spacing:0.04em;text-transform:uppercase;
+  }
+  .sec-head .arw{font-family:'JetBrains Mono',monospace;font-size:13px;transition:transform .2s;}
+  .sec-body{
+    padding:32px;background:var(--white);border-top:3px solid var(--ink);
+    font-size:17px;line-height:1.7;
+  }
+  .sec-body p + p{margin-top:18px;}
+  .hidden{display:none !important;}
+
+  .items{display:flex;flex-direction:column;gap:14px;}
+  .item{border:2px solid var(--ink);background:var(--paper);padding:18px 20px;}
+  .item .it{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;
+    text-transform:uppercase;letter-spacing:0.03em;margin-bottom:6px;
+  }
+  .item .ib{font-size:16px;line-height:1.55;}
+
+  .flow{display:flex;flex-direction:column;gap:0;margin-bottom:24px;}
+  .step{display:flex;gap:18px;align-items:flex-start;}
+  .step .num{
+    width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;
+  }
+  .step .sbody{padding-bottom:4px;}
+  .step .st{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;
+    text-transform:uppercase;letter-spacing:0.03em;margin-bottom:4px;
+  }
+  .step .sd{font-size:16px;line-height:1.55;}
+  .rail{width:40px;display:flex;justify-content:center;}
+  .rail span{display:block;width:2px;height:22px;background:var(--muted);}
+
+  .canvas{margin:28px 0 0;}
+  .canvas img{
+    display:block;width:100%;height:auto;border:2px solid var(--ink);background:var(--paper);
+  }
+  .canvas figcaption{
+    font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);
+    margin-top:10px;text-align:center;
+  }
+
+  .scale{display:flex;flex-wrap:wrap;align-items:flex-start;gap:0;margin-bottom:26px;}
+  .sc{display:flex;align-items:flex-start;}
+  .sc-in{display:flex;flex-direction:column;align-items:center;min-width:150px;}
+  .sc-num{
+    width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;margin-bottom:12px;
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;
+  }
+  .sc-box{border:2px solid var(--ink);background:var(--paper);padding:14px 16px;width:100%;text-align:center;}
+  .sc-t{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;}
+  .sc-s{font-size:14px;color:var(--muted);}
+  .sc-arw{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--muted);padding:20px 12px 0;}
+
+  .card{border:3px solid var(--ink);margin-top:20px;}
+  .card-head{
+    padding:22px 28px;background:var(--accent);display:flex;
+    align-items:center;justify-content:space-between;gap:20px;cursor:pointer;
+  }
+  .card-head h2{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;letter-spacing:0.04em;text-transform:uppercase;}
+  .card-head .arw{font-family:'JetBrains Mono',monospace;font-size:13px;}
+  .card-body{background:var(--white);border-top:3px solid var(--ink);}
+  .card-intro{padding:24px 28px;font-size:17px;line-height:1.6;border-bottom:1px solid #E4E1D2;}
+  .card-intro strong{font-weight:700;}
+  .row{display:flex;gap:20px;padding:18px 28px;border-bottom:1px solid #E4E1D2;}
+  .row:last-child{border-bottom:none;}
+  .row .rl{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+    text-transform:uppercase;letter-spacing:0.03em;
+    width:150px;min-width:150px;flex-shrink:0;color:var(--muted);
+  }
+  .row .rv{font-size:16px;line-height:1.55;}
+
+  footer{background:var(--ink);color:var(--paper);margin-top:48px;}
+  footer .in{max-width:1240px;margin:0 auto;padding:32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+  footer .nm{font-weight:700;font-size:16px;}
+  footer a{
+    font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+    text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);text-decoration:none;
+  }
+  footer a:hover{color:var(--paper);}
+
+  :focus-visible{outline:3px solid var(--mid);outline-offset:3px;}
+  @media (prefers-reduced-motion:reduce){*{transition:none !important;}}
+  @media (max-width:900px){
+    .navlinks{display:none;}
+    .burger{display:flex;}
+    nav.top{padding:20px;}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 20px 60px;}
+    .mobmenu{padding:8px 20px 24px;}
+    .sec-body{padding:24px 20px;}
+    .row{flex-direction:column;gap:6px;}
+    .scale{flex-direction:column;align-items:flex-start;}
+    .sc-arw{display:none;}
+    .sc-in{min-width:0;width:100%;align-items:flex-start;}
+    .sc-box{text-align:left;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="top">
+    <a class="logo" href="https://ancatrif.com">Anca Trif</a>
+
+    <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="navlinks" id="navlinks">
+      <a href="https://ancatrif.com/#about">About</a>
+      <a href="https://ancatrif.com/#projects">Projects</a>
+
+      <div class="drop">
+        <button class="dt" type="button">Use Cases <span class="car">&#9662;</span></button>
+        <div class="dmenu"><div class="dmenu-in">
+          <a href="https://ancatrif.com/a3-tool/">Product and Engineering</a>
+          <a href="https://ancatrif.com/hr-agent/">People and Culture</a>
+          <a href="https://loop-brief-presentation.onrender.com/">Cross-Team Collaboration</a>
+          <a href="https://ancatrif.com/lead-qualifier/">Sales</a>
+        </div></div>
+      </div>
+
+      <div class="drop">
+        <button class="dt" type="button">Learning Tools <span class="car">&#9662;</span></button>
+        <div class="dmenu"><div class="dmenu-in">
+          <a href="https://gdpr-quiz.ancatrif.com" target="_blank" rel="noopener">GDPR &amp; EU AI Act Quiz</a>
+        </div></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mobmenu" id="mobmenu">
+    <a href="https://ancatrif.com/#about">About</a>
+    <a href="https://ancatrif.com/#projects">Projects</a>
+    <div class="grp">Use Cases</div>
+    <a class="sub" href="https://ancatrif.com/a3-tool/">Product and Engineering</a>
+    <a class="sub" href="https://ancatrif.com/hr-agent/">People and Culture</a>
+    <a class="sub" href="https://loop-brief-presentation.onrender.com/">Cross-Team Collaboration</a>
+    <a class="sub" href="https://ancatrif.com/lead-qualifier/">Sales</a>
+    <div class="grp">Learning Tools</div>
+    <a class="sub" href="https://gdpr-quiz.ancatrif.com" target="_blank" rel="noopener">GDPR &amp; EU AI Act Quiz</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="back" href="https://ancatrif.com/#projects">&larr; Back to portfolio</a>
+
+  <div class="hero">
+    <h1>Sales Lead Qualifier</h1>
+    <div class="tags">
+      <span class="tag">AI</span>
+      <span class="tag">Agentic</span>
+      <span class="tag">n8n</span>
+      <span class="tag">Claude</span>
+      <span class="tag">2026</span>
+    </div>
+    <p class="lede">A proof-of-concept agentic workflow testing one specific assumption: that an agent which decides for itself what to check, and says plainly when it cannot call a lead, earns the right to go unreviewed on everything else. Built end to end in n8n: webhook, two tools the model chooses between, scoring, confidence-based routing, logging, Slack.</p>
+    <a class="cta" href="#" id="demo-link" target="_blank" rel="noopener">Try the demo &rarr;</a>
+  </div>
+
+  <div class="notice">
+    <strong>This is a demo with synthetic data.</strong> The contact histories and company records are written for this demo. No real people, no real companies, no real pipeline. The point is to test the mechanism, not to represent any actual sales team.
+  </div>
+
+  <div class="sections" id="sections"></div>
+
+  <div class="card">
+    <div class="card-head" id="card-head" role="button" tabindex="0" aria-expanded="true">
+      <h2>Model card</h2>
+      <span class="arw" id="card-arw">&#9650;</span>
+    </div>
+    <div class="card-body" id="card-body"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="in">
+    <div class="nm">Anca Trif</div>
+    <a href="https://www.linkedin.com/in/ancatrif" target="_blank" rel="noopener">LinkedIn &#8599;</a>
+  </div>
+</footer>
+
+<script>
+/* Set this once the demo is deployed. */
+const DEMO_URL = "https://lead-qualifier-demo.onrender.com";
+document.getElementById('demo-link').setAttribute('href', DEMO_URL);
+
+/* mobile menu */
+const burger = document.getElementById('burger');
+const mobmenu = document.getElementById('mobmenu');
+burger.addEventListener('click', () => {
+  const open = mobmenu.classList.toggle('open');
+  burger.setAttribute('aria-expanded', String(open));
+});
+
+const tradeoffs = [
+  { t: "An agent, not a scoring rule",
+    b: "Every CRM ships with rule-based scoring, and for clean criteria a rule is cheaper, faster and easier to audit. Rules break on the messy middle: they run the same checks on every lead whether or not those checks make sense, they cannot weigh \u201cdownloaded pricing twice but ignored three emails\u201d against \u201cvague message from a domain nobody has heard of\u201d, and they cannot say they are unsure. The agent was worth building for the third one." },
+  { t: "Judgment, not prediction",
+    b: "This does not try to out-predict a predictive scoring model, and it would lose if it did. A model trained on a company's own closed-won and closed-lost history has learned what actually converted, which an agent reasoning from first principles has no access to. The honest split is machine learning for the number, a language model for reading the message someone wrote, handling the cases with no precedent, and saying out loud when it is unsure." },
+  { t: "Confidence routes, not score",
+    b: "Score decides who gets told. Confidence decides whether a person is needed at all. A confident read is logged and, if hot, handed to sales. An uncertain one goes to a human instead. Nobody reviews every lead, only the ones the agent could not call." },
+  { t: "Two lookups, offered rather than sequenced",
+    b: "The system prompt describes what each tool is for and leaves the decision to the model. It is not told to call both, or to call them in order. That is the whole point of the build: on a personal email address with no company attached, the agent skips the company lookup on its own." },
+  { t: "Fixtures instead of a CRM and an enrichment API",
+    b: "Two spreadsheets stand in for contact history and company data. In production these are different systems: contact history accumulates inside the CRM from tracked activity, while company data is bought per lookup from an enrichment provider. The mechanism under test does not change." },
+  { t: "Preset leads instead of a free-text form",
+    b: "A visitor-invented lead misses both lookups and returns the same flat result every time, which is the least interesting thing the agent does. Presets have data behind them and produce genuinely different paths." },
+  { t: "No proxy, unlike the Loop Brief agent",
+    b: "That one sits behind a Render proxy which hides the backend URL, locks CORS to one origin, rate-limits, and validates free text. With no free-text surface here, only the CORS part applies, and response headers on the webhook node handle it. Same reasoning, less machinery." }
+];
+
+const flow = [
+  { n: 1, t: "Webhook trigger", d: "Receives a POST containing a lead's name, email, company domain, and the message they sent." },
+  { n: 2, t: "AI Agent", d: "Claude reads the lead and decides which of two lookups to run. Contact history is keyed by email, company data by domain. It can call both, one, or neither." },
+  { n: 3, t: "Code node", d: "The model wraps its JSON in prose, so this pulls out the first object it finds and parses it. If parsing fails, the lead is marked low confidence, which sends it to a human rather than letting it slip through." },
+  { n: 4, t: "Respond to webhook", d: "The score, the reasoning, the confidence, and the list of tools actually called go straight back to whatever submitted the lead." },
+  { n: 5, t: "Route on confidence, then on score", d: "Low confidence posts to a review channel in Slack. High confidence and hot posts to the sales channel. Everything else is logged quietly. Every lead is logged either way." }
+];
+
+const notReady = [
+  { t: "Confidently wrong is uncaught",
+    b: "Only self-reported uncertainty triggers review, so a lead the agent is sure about and wrong about goes through untouched. The fix worth building is sampling: send a small random slice of confident decisions to review anyway, so the system is measured rather than trusted." },
+  { t: "Slack is where the loop stops",
+    b: "A person reads the alert and then acts somewhere else. Closing it properly means interactive buttons in Slack posting a decision back to a second webhook, and that decision writing to the CRM record. That is a real feature, not a finishing touch." },
+  { t: "No authentication, no rate limiting",
+    b: "The endpoint is open. The demo only submits four fixed leads, so there is no free-text surface to abuse, but an open webhook still costs API calls if someone leans on it." },
+  { t: "Three score levels is coarse",
+    b: "Real systems mostly score 0 to 100, which lets a team move the threshold or cap by capacity without redefining what hot means." }
+];
+
+const scale = [
+  { n: 1, t: "Real trigger", s: "CRM fires on lead creation" },
+  { n: 2, t: "Live enrichment", s: "Paid lookup, not a sheet" },
+  { n: 3, t: "Write-back", s: "Score onto the record" },
+  { n: 4, t: "Evals", s: "Sampling and measurement" }
+];
+
+const scaleProse = [
+  "The shape holds as it grows. Receive, decide what to check, check it, judge, say how sure you are, route. What changes underneath is the plumbing: a form POST becomes a CRM webhook firing on record creation, a spreadsheet becomes a real enrichment API with a cost per call, and the score stops living in a log and starts living on the contact record.",
+  "That last step is the one to be careful with. Once the agent's score is written back to the CRM, the next run reads its own earlier output as an input, and it can start agreeing with itself. Keeping human-set and agent-set scores distinguishable in the data is what stops that."
+];
+
+const valueItems = [
+  { t: "Speed of response",
+    b: "This is the strongest lever and the best evidenced one in sales research: how quickly an inbound lead gets a response correlates sharply with whether it converts, and the steepest drop is in the first minutes rather than the first hours. An agent that scores and routes on arrival, at three in the morning and on the four hundredth lead of the month, compresses that window to seconds." },
+  { t: "Attention, not hours",
+    b: "A rep can skim twenty leads quickly, so claiming this saves hours of triage would not survive contact with anyone who has done the job. What it changes is where attention lands. The lead worth calling today surfaces in a channel instead of sitting fourth in a list, and the ones that were never going to convert stop costing anything at all." },
+  { t: "Consistency at the two hundredth lead",
+    b: "Every lead gets the same checks considered and the same criteria applied. Human triage is good at the start of the week and worse at the end of it, and that variance is invisible because nobody audits the leads they decided to ignore." },
+  { t: "Something to argue with",
+    b: "The complaint about lead scoring in practice is rarely that the number is wrong, it is that nobody can interrogate it. A rep who sees a bad-fit company scoring 85 with no explanation stops trusting the whole system quietly, and the scores keep being produced and keep being ignored. A sentence naming the specific evidence gives someone a thing to disagree with, which is what keeps the system in use." }
+];
+
+const valueProse = [
+  "Running it costs roughly two model calls and a couple of lookups per lead, which at any realistic inbound volume is cents rather than a line item. The real cost is building it and keeping it honest.",
+  "It is worth being equally clear about when this is the wrong thing to build. Under about fifty inbound leads a month, a person reading all of them is faster, cheaper and better. Where fit is cleanly expressible, over two hundred seats, in these three industries, a rule is more predictable and easier to audit than any agent. And the case only holds at all if the confidence flag turns out to be trustworthy, because exception-only review is the entire saving. If people end up checking the confident ones anyway, this is an expensive way to produce a number a rule could have given them."
+];
+
+const sections = [
+  { title: "The problem it solves", body:
+    "Inbound leads arrive faster than anyone qualifies them properly. A rep either works them in order and spends real time on ones that were never going to convert, or skims and misjudges. The information needed to judge well, whether this person has engaged before and whether this company is even a fit, sits in two or three systems nobody opens for every form fill.\n\nRule-based scoring already solves most of this, and where fit is cleanly expressible a rule is the better tool: cheaper, more predictable, easier to audit. So the assumption worth testing is not whether a model can score a lead. It is whether an agent that reports its own uncertainty can be trusted enough that nobody reviews the rest. If that holds, exception-only review is possible. If it does not, this is an expensive way to get a number a rule could have produced." },
+  { title: "Business value", kind: "value" },
+  { title: "Design choices and tradeoffs", kind: "tradeoffs" },
+  { title: "Architecture in plain language", kind: "flow" },
+  { title: "What it is not ready for yet", kind: "notready" },
+  { title: "How it would scale", kind: "scale" },
+  { title: "Reflection", body:
+    "The hardest part of building this was that nothing ever told me it was broken. A deterministic workflow fails by stopping, but an agent fails by carrying on fluently: the run reported success in twenty-two seconds while the agent was actually replying that no lead details had been included, every node showed a green checkmark on executions that produced nothing usable, and when the tool names in my system prompt did not match the node names on the canvas, the agent did not error, it wrote out plausible-looking tool calls as prose and then reasoned confidently from results it had invented. What eventually got me out of it was changing what I treated as evidence. Instead of asking whether a node ran, I started reading what actually went into it and came back out, opening the input panel to see the real shape of the data rather than trusting the expression preview, checking the agent's logs for tool calls rather than reading its final answer, and adding a parse step that fails toward human review instead of quietly passing a malformed result down the chain. That habit is now built into the tool itself, which is why a lead the agent cannot confidently judge goes to a person rather than into the pile." }
+];
+
+const modelName = "Claude Sonnet 5";
+
+const modelCard = [
+  { l: "Good at", v: "Weighing a handful of mixed signals into a judgment, explaining that judgment in a sentence a person can argue with, and declining to commit when the evidence is thin." },
+  { l: "Watch out for", v: "It reports which tools it called, but that report comes from the model, not from the workflow. It has matched the execution log every time I have checked, and it is still self-reported rather than observed." },
+  { l: "Safety", v: "Anthropic reports Sonnet 5 as safer than Sonnet 4.6 in agentic contexts specifically: better at refusing malicious requests, more resistant to hijack attempts through prompt injection, and with lower rates of hallucination and sycophancy. That agentic framing is the relevant one here, because this workflow hands the model live tools rather than asking it a single question." },
+  { l: "Your role", v: "Low-confidence leads are the ones designed to reach you. Confident ones are logged and, if hot, passed to sales. That only works if someone occasionally checks whether the confident ones were right." },
+  { l: "Data", v: "All contact and company records are synthetic. Lead details are sent to the Anthropic API. No real customer data is used anywhere in this demo." }
+];
+
+const credits = { title: "Credits", body: "Built in n8n, an open-source workflow automation tool, connected to the Anthropic API, with Google Sheets standing in for a CRM and an enrichment provider, and Slack for alerts. All data is synthetic, written for this demo and not drawn from any real company." };
+
+/* ---------- render ---------- */
+const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+
+function paras(text){
+  const frag = document.createDocumentFragment();
+  text.split('\n\n').forEach(p => frag.appendChild(el('p', null, p)));
+  return frag;
+}
+
+function itemList(arr){
+  const box = el('div','items');
+  arr.forEach(o => {
+    const it = el('div','item');
+    it.appendChild(el('div','it',o.t));
+    it.appendChild(el('div','ib',o.b));
+    box.appendChild(it);
+  });
+  return box;
+}
+
+function buildBody(sec){
+  const body = el('div','sec-body');
+  if (sec.kind === 'tradeoffs') body.appendChild(itemList(tradeoffs));
+  else if (sec.kind === 'notready') body.appendChild(itemList(notReady));
+  else if (sec.kind === 'value'){
+    body.appendChild(itemList(valueItems));
+    const gap = el('div'); gap.style.height = '4px'; body.appendChild(gap);
+    valueProse.forEach(p => body.appendChild(el('p',null,p)));
+  }
+  else if (sec.kind === 'flow'){
+    body.appendChild(paras("The workflow runs as a single n8n pipeline triggered by a webhook. One agent, two tools it chooses between, and a branch that decides who hears about the result."));
+    const f = el('div','flow');
+    flow.forEach((s,i) => {
+      const row = el('div','step');
+      row.appendChild(el('div','num',String(s.n)));
+      const sb = el('div','sbody');
+      sb.appendChild(el('div','st',s.t));
+      sb.appendChild(el('div','sd',s.d));
+      row.appendChild(sb);
+      f.appendChild(row);
+      if (i < flow.length - 1){
+        const rail = el('div','rail'); rail.appendChild(el('span'));
+        f.appendChild(rail);
+      }
+    });
+    body.appendChild(f);
+
+    const fig = el('figure','canvas');
+    const img = el('img');
+    img.src = 'lead-qualifier.png';
+    img.alt = 'The n8n workflow canvas: a webhook feeding an AI Agent with two Google Sheets tools attached, then a code node, then branches to Slack and a results sheet.';
+    img.loading = 'lazy';
+    fig.appendChild(img);
+    fig.appendChild(el('figcaption', null, 'The actual n8n workflow canvas'));
+    body.appendChild(fig);
+  }
+  else if (sec.kind === 'scale'){
+    const s = el('div','scale');
+    scale.forEach((x,i) => {
+      const w = el('div','sc');
+      const inn = el('div','sc-in');
+      inn.appendChild(el('div','sc-num',String(x.n)));
+      const bx = el('div','sc-box');
+      bx.appendChild(el('div','sc-t',x.t));
+      bx.appendChild(el('div','sc-s',x.s));
+      inn.appendChild(bx);
+      w.appendChild(inn);
+      if (i < scale.length - 1) w.appendChild(el('span','sc-arw','\u2192'));
+      s.appendChild(w);
+    });
+    body.appendChild(s);
+    scaleProse.forEach(p => body.appendChild(el('p',null,p)));
+  }
+  else body.appendChild(paras(sec.body));
+  return body;
+}
+
+const host = document.getElementById('sections');
+const all = sections.concat([{ title: credits.title, body: credits.body }]);
+
+all.forEach((sec, i) => {
+  const card = el('div','sec');
+  const head = el('div','sec-head');
+  head.setAttribute('role','button');
+  head.setAttribute('tabindex','0');
+  head.setAttribute('aria-expanded', i === 0 ? 'true' : 'false');
+  head.appendChild(el('h2',null,sec.title));
+  const arw = el('span','arw', i === 0 ? '\u25B2' : '\u25BC');
+  head.appendChild(arw);
+
+  const body = buildBody(sec);
+  if (i !== 0) body.classList.add('hidden');
+
+  function toggle(){
+    const open = !body.classList.contains('hidden');
+    body.classList.toggle('hidden', open);
+    arw.textContent = open ? '\u25BC' : '\u25B2';
+    head.setAttribute('aria-expanded', String(!open));
+  }
+  head.addEventListener('click', toggle);
+  head.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); } });
+
+  card.appendChild(head);
+  card.appendChild(body);
+  host.appendChild(card);
+});
+
+const cardBody = document.getElementById('card-body');
+const intro = el('div','card-intro');
+intro.appendChild(document.createTextNode('This workflow runs on '));
+intro.appendChild(el('strong', null, modelName));
+intro.appendChild(document.createTextNode(', built by Anthropic.'));
+cardBody.appendChild(intro);
+
+modelCard.forEach(r => {
+  const row = el('div','row');
+  row.appendChild(el('div','rl',r.l));
+  row.appendChild(el('div','rv',r.v));
+  cardBody.appendChild(row);
+});
+
+const cardHead = document.getElementById('card-head');
+const cardArw = document.getElementById('card-arw');
+function toggleCard(){
+  const open = !cardBody.classList.contains('hidden');
+  cardBody.classList.toggle('hidden', open);
+  cardArw.innerHTML = open ? '&#9660;' : '&#9650;';
+  cardHead.setAttribute('aria-expanded', String(!open));
+}
+cardHead.addEventListener('click', toggleCard);
+cardHead.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleCard(); } });
+</script>
+</body>
+</html>
